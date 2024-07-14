@@ -1,2 +1,5 @@
-dataset
+dataset/processed/*
+dataset/raw/*
+dataset/raw_video/*
+models/*
 venv

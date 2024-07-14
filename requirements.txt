@@ -1,0 +1,5 @@
+opencv-python-headless
+opencv-contrib-python-headless
+
+# Path: requirements-dev.txt
+# Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements-dev.txt
