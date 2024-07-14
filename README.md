@@ -5,8 +5,10 @@
 To insert the `image.png` into the `README.md` file, you can use the following markdown:
 
 ```markdown
-![Image](image.png)
+![Image](/image.png)
 ```
+
+
 Với:
 <ul>
     <li>dataset: Thư mục chứ dataset để huấn luyện</li>
