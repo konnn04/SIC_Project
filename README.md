@@ -15,7 +15,7 @@ Với:
     <li>dataset/processed: Thư mục chứ thư mục ảnh đã qua xử lý (Cắt ảnh mặt, xoay,...)</li>
     <li>models: Thư mục chứ model đã huấn luyện xuất ra</li>
     <li>src: Chứa source code của bạn</li>
-    <li>requirements.txt: Chứa các thư viện cần thiết để chạy. Trong lúc phát triển Project, vui lòng bổ sung nếu có cài thêm thư viện mới. <b>Cài nhanh bằng: "pip install -r requirements-dev.txt"</b></li>
+    <li>requirements.txt: Chứa các thư viện cần thiết để chạy. Trong lúc phát triển Project, vui lòng bổ sung nếu có cài thêm thư viện mới. <b>Cài nhanh bằng: "pip install -r requirements.txt"</b></li>
     <li>src\frame_video.py: Demo tách frame khuôn mặt</li>
 
 </ul>
