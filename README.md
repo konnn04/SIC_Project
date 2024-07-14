@@ -21,15 +21,18 @@ Với:
 </ul>
 
 <h2>2. Phân chia công việc</h2>
-1. Tách video thành ảnh mặt (đã cắt) (1 người) (Nhất Duy)
-- Điều kiện:kích thước 128 x 128, 5frame/s (GRAYSCALE hoặc màu cũng được)
-- Tìm từ khóa face recognition và OpenCV để hỗ trợ làm
-2. Tạo mô hình nhận diện khuôn mặt (Cả nhóm - nghiên cứu sau)
-- MCNN 
-- face recognition
-3. Train
-4. Test
-5. Triển khai viết webapp
-6. Xây database lưu người
+<ol>
+    <li>Tách video thành ảnh mặt (đã cắt) (1 người) (Nhất Duy)</li>
+    - Điều kiện:kích thước 128 x 128, 5frame/s (GRAYSCALE hoặc màu cũng được)\
+    - Tìm từ khóa face recognition và OpenCV để hỗ trợ làm\
+    <li>Tạo mô hình nhận diện khuôn mặt (Cả nhóm - nghiên cứu sau)</li>
+    - MCNN \
+    - face recognition \
+    <li>Train</li>
+    <li>Test</li>
+    <li>...</li>
+</ol>
+
+
 <h2>3. Lộ trình</h2>
 <h1><b>TÁCH ẢNH</b> -> VIẾT MÔ HÌNH -> TRAIN -> TEST -> TỐI ƯU -> XÂY DỰNG DATABASE -> VIẾT WEBAPP</h1>
