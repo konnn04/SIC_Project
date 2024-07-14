@@ -2,7 +2,11 @@
 <h2>1. Giới thiệu</h2>
 <p>Là một dự án nhóm xây dựng mô hình nhận diện khuôn mặt qua webcam thực tế, đa khuôn mặt</p>
 <h3>Cấu trúc thư mục</h3>
-![alt text](image.png)
+To insert the `image.png` into the `README.md` file, you can use the following markdown:
+
+```markdown
+![Image](image.png)
+```
 Với:
 <ul>
     <li>dataset: Thư mục chứ dataset để huấn luyện</li>
