@@ -57,6 +57,7 @@ def extract_faces_from_video(video_path, output_dir, face_cascade_path):
         success, image = cap.read()
         if not success:
             break
+        
         image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         
 
