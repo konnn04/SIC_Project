@@ -1,6 +1,6 @@
 from facenet_pytorch import MTCNN
 import cv2
-from PIL import Image
+# from PIL import Image
 import torch
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -49,7 +49,7 @@ def process_video(file, p, output_path, folder_name, mtcnn):
         leap += 1
     cap.release()
 
-def extract_face(input_path='Project\\SIC_Project\\Face recognition data\\Dataset', output_path='Project\\SIC_Project\\Face recognition data\\NewData'):
+def extract_face(input_path='dataset/raw_video', output_path='Test_file/processed'):
     mtcnn = MTCNN(margin=20, keep_all=False, post_process=False, device=device)
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         for folder_name in os.listdir(input_path):

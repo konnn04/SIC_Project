@@ -1,19 +1,23 @@
 import cv2
 import os
-import numpy as np
-from matplotlib import pyplot as plt
-from PIL import Image
+# import numpy as np
+# from matplotlib import pyplot as plt
+# from PIL import Image
 import torch
-import time
+# import time
 from tqdm.notebook import tqdm
-from facenet_pytorch import MTCNN
+# from facenet_pytorch import MTCNN
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 face_cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-path_video_face = 'Project\\SIC_Project\\Data\\Dataset' # đường dẫn tới folder video
-path_frame = 'Project\\SIC_Project\\Data\\NewData' # đường dẫn tới folder ảnh cắt từ video
-path_frame_face = 'Project\\SIC_Project\\Data\\NewData' # đường dẫn tới ảnh sau khi cắt từ frame
+# path_video_face = 'Project\\SIC_Project\\Data\\Dataset' # đường dẫn tới folder video
+# path_frame = 'Project\\SIC_Project\\Data\\NewData' # đường dẫn tới folder ảnh cắt từ video
+# path_frame_face = 'Project\\SIC_Project\\Data\\NewData' # đường dẫn tới ảnh sau khi cắt từ frame
+
+path_video_face = 'dataset\\raw_video' # đường dẫn tới folder video
+path_frame = 'dataset\\raw' # đường dẫn tới folder ảnh cắt từ video
+path_frame_face = 'dataset\\processed' # đường dẫn tới ảnh sau khi cắt từ frame
 
 
 # Source code cũ
@@ -76,5 +80,7 @@ if __name__ == '__main__':
                     extract_faces_from_video(os.path.join(dir_path,file), os.path.join(path_frame_face, dir_name), face_cascade_path)
                 except Exception as e:
                     print(f"Co loi")
+                    print(e)
+
             
             cur_label += 1

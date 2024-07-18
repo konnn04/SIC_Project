@@ -3,3 +3,5 @@ dataset/raw/*
 dataset/raw_video/*
 models/*
 venv
+Test_file/*
+

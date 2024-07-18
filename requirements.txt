@@ -1,5 +1,8 @@
 opencv-python-headless
 opencv-contrib-python-headless
-
-# Path: requirements-dev.txt
+matplotlib
+torch
+tqdm
+facenet_pytorch
+# Path: requirements.txt
 # Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
