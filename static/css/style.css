@@ -1,0 +1,143 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    background: url('/static/images/AI_pic.jpg');
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+} 
+
+
+.header-container {
+    background-color: rgba(65, 208, 248, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    
+    border-radius: 10px;
+    /* position: relative; */
+}
+
+
+
+.header-container h2 {
+    text-align: center;
+    margin-top: 20px;
+    color: #009970;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    font-weight: bold;
+    
+}
+
+.offcanvas {
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    max-width: 50%; /* Giới hạn chiều rộng tối đa là 50% */
+    height: 100vh !important; /* Chiều cao 100% của viewport */
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+.offcanvas.show {
+    transform: translateX(0);
+}
+.offcanvas-header {
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+
+.offcanvas-body {
+    padding: 60px 20px 20px;
+}
+
+.offcanvas .nav-link {
+    padding: 10px 20px;
+    font-size: 18px;
+}
+
+/* Làm mờ phần còn lại của màn hình */
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* .navbar {
+    background-color: transparent !important;
+    box-shadow: none !important;
+} */
+
+.navbar-brand {
+    font-weight: bold;
+    color: #009970;
+}
+
+.nav-link {
+    color: #333333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #009970;
+}
+
+.login-button {
+    background-color: #009970;
+    color: #ffffff;
+    font-size: 14px;
+    padding: 8px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #007d5c;
+    transform: translateY(-2px);
+}
+
+.navbar-toggler {
+    border: none;
+    font-size: 1.25rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: #333; /* Màu chữ mặc định */
+    padding: 10px 20px;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+    border-radius: 5px; /* Bo góc cho giống button */
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+    color: #fff; /* Màu chữ khi hover */
+    background-color: #007bff; /* Màu nền khi hover, bạn có thể thay đổi màu này */
+    transform: translateY(-2px); /* Hiệu ứng nâng nhẹ khi hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ */
+}
+
+/* Nếu bạn muốn giữ màu active cho mục menu hiện tại */
+.navbar-nav .nav-item .nav-link.active {
+    color: #190202;
+     /* Màu nền cho mục active */
+}
+
+/* Tùy chọn: Thêm hiệu ứng khi click */
+.navbar-nav .nav-item .nav-link:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

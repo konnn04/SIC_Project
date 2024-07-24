@@ -1,6 +1,5 @@
 # Xử lý video thành frame, sau đó xử lý frame thành ảnh đã được xử lý.
-# Đường dẫn thư mục video: dataset\raw_video
-
+# Đường dẫn thư mục video: dataset\raw_frame
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -14,71 +13,15 @@ import facenet
 import align.detect_face
 import random
 from time import sleep
-import cv2
+# import cv2
 
-VIDEO_PATH = os.path.join(os.getcwd(), 'dataset\\raw_video')
-FRAMES_PATH = os.path.join(os.getcwd(), 'dataset\\raw_frame')
-PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset\\processed')
+# VIDEO_PATH = os.path.join(os.getcwd(), 'dataset\\raw_video')
+FRAMES_PATH = os.path.join(os.getcwd(), 'dataset\\raw_test')
+PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset\\processed_test')
 
 SIZE = 160
 MARGIN  = 32
-GPU_MEMORY_FRACTION = 1.0
-DELETE_FRAME_EXPORT = True
-
-
-def delete_directory(directory_path):
-    # Kiểm tra nếu đường dẫn tồn tại
-    if os.path.exists(directory_path):
-        for root, dirs, files in os.walk(directory_path, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(directory_path)
-        print(f"Đã xóa: {directory_path}")
-    else:
-        print(f"Không thấy thư mục: {directory_path}")
-
-def extract_frames_from_videos(video_dir = VIDEO_PATH, output_dir  = FRAMES_PATH, processed_dir=PROCESSED_PATH, frames_per_second=10, delete_frame_export=DELETE_FRAME_EXPORT):
-    for label in os.listdir(video_dir):
-        label_path = os.path.join(video_dir, label)        
-        # Kiểm tra nếu label_path là thư mục
-        if os.path.isdir(label_path):
-            # Tạo thư mục đầu ra cho nhãn nếu chưa tồn tại
-            label_output_dir = os.path.join(output_dir, label)
-            if not os.path.exists(label_output_dir):
-                os.makedirs(label_output_dir)                
-            # Duyệt qua tất cả các video trong thư mục nhãn
-            for video_file in os.listdir(label_path):
-                video_path = os.path.join(label_path, video_file)                
-                # Kiểm tra nếu video_path là file
-                if os.path.isfile(video_path):
-                    print(f"Đang xử lý: {video_path}")
-                    extract_frames(video_path, label_output_dir, frames_per_second)
-    print("Đã xong. Đến bước xử lý!")
-    
-    data_preprocessing(output_dir, processed_dir, SIZE, MARGIN, random_order=True, gpu_memory_fraction=GPU_MEMORY_FRACTION, detect_multiple_faces=False)
-    if delete_frame_export:
-        delete_directory(FRAMES_PATH)
-
-def extract_frames(video_path, output_folder, frames_per_second=10):
-    video_capture = cv2.VideoCapture(video_path)
-    fps = int(video_capture.get(cv2.CAP_PROP_FPS))
-    interval = fps // frames_per_second
-    frame_count = 0
-    extracted_frame_count = 0
-    while True:
-        ret, frame = video_capture.read()
-        if not ret:
-            break
-        if frame_count % interval == 0:
-            frame_filename = os.path.join(output_folder, f"frame_{extracted_frame_count:04d}.jpg")
-            cv2.imwrite(frame_filename, frame)
-            extracted_frame_count += 1
-        frame_count += 1
-    video_capture.release()
-    print(f"Đã trích xuất {extracted_frame_count} khung hình từ {video_path} vào {output_folder}.")
-
+GPU_MEMORY_FRACTION = 0.25
 
 def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, image_size=SIZE, margin=MARGIN, random_order=False, gpu_memory_fraction=1.0, detect_multiple_faces=False):
     sleep(random.random())
@@ -93,8 +36,8 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
     with tf.Graph().as_default():
         # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
         sess = tf.compat.v1.Session()
-        # config=tf.ConfigProto()
-        # gpu_options=gpu_options, log_device_placement=False
+        #config=tf.ConfigProto())
+        # #gpu_options=gpu_options, log_device_placement=False))
         with sess.as_default():
             pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
     
@@ -121,7 +64,7 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                 nrof_images_total += 1
                 filename = os.path.splitext(os.path.split(image_path)[1])[0]
                 output_filename = os.path.join(output_class_dir, filename+'.png')
-                print(f'✅'+image_path)
+                print(image_path)
                 if not os.path.exists(output_filename):
                     try:
                         import imageio
@@ -131,7 +74,7 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                         print(errorMessage)
                     else:
                         if img.ndim<2:
-                            print('❌"%s"' % image_path)
+                            print('Unable to align "%s"' % image_path)
                             text_file.write('%s\n' % (output_filename))
                             continue
                         if img.ndim == 2:
@@ -178,7 +121,7 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                                 imageio.imwrite(output_filename_n, scaled)
                                 text_file.write('%s %d %d %d %d\n' % (output_filename_n, bb[0], bb[1], bb[2], bb[3]))
                         else:
-                            print('❌"%s"' % image_path)
+                            print('Unable to align "%s"' % image_path)
                             text_file.write('%s\n' % (output_filename))
                             
     print('Tổng số ảnh: %d' % nrof_images_total)
@@ -186,5 +129,4 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
      
 
 if __name__ == '__main__':
-    extract_frames_from_videos()
-
+    data_preprocessing(FRAMES_PATH, PROCESSED_PATH, SIZE, MARGIN, random_order=True, gpu_memory_fraction=GPU_MEMORY_FRACTION, detect_multiple_faces=False)

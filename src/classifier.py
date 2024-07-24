@@ -4,22 +4,22 @@ from __future__ import print_function
 
 import tensorflow as tf
 import numpy as np
-import argparse
+# import argparse
 import facenet
 import os
-import sys
+# import sys
 import math
 import pickle
 from sklearn.svm import SVC
 
-MODE = "TRAIN" # or "CLASSIFY"
+MODE = "TRAIN" # "TRAIN"or "CLASSIFY"
 MODEL_PATH = os.path.join(os.getcwd(), "models\\20180402-114759.pb")
 CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models\\classifier.pkl")
 DATA_DIR = os.path.join(os.getcwd(),"dataset\\processed")
 BATCH_SIZE = 1000
 IMAGE_SIZE = 160
 SEED = 666
-TEST_DIR = os.path.join(os.getcwd(),"dataset\\test")
+TEST_DIR = os.path.join(os.getcwd(),"dataset\\processed_test")
 
 def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):
   
@@ -41,8 +41,8 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
                 dataset = facenet.get_dataset(data_dir)
 
             # Kiểm tra phải có ít nhất 1 ảnh để phân lớp
-            for cls in dataset:
-                assert(len(cls.image_paths)>0, 'Phải có ít nhất 1 ảnh cho môi lớp trong thư mục dữ liệu')
+            # for cls in dataset:
+            #     assert(len(cls.image_paths)>0, 'Phải có ít nhất 1 ảnh cho môi lớp trong thư mục dữ liệu')
 
                  
             paths, labels = facenet.get_image_paths_and_labels(dataset)
@@ -77,7 +77,7 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
 
             if (mode=='TRAIN'):
                 # Train classifier
-                print('Training classifier')
+                print('Training phân lớp')
                 model = SVC(kernel='linear', probability=True)
                 model.fit(emb_array, labels)
             
