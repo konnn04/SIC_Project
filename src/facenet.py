@@ -539,7 +539,7 @@ def store_revision_info(src_path, output_dir, arg_string):
     rev_info_filename = os.path.join(output_dir, 'revision_info.txt')
     with open(rev_info_filename, "w") as text_file:
         text_file.write('arguments: %s\n--------------------\n' % arg_string)
-        text_file.write('tensorflow version: %s\n--------------------\n' % tf.__version__)  # @UndefinedVariable
+        text_file.write('tensorflow version: %s\n--------------------\n' % tf.__version__)  
         text_file.write('git hash: %s\n--------------------\n' % git_hash)
         text_file.write('%s' % git_diff)
 

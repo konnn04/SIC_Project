@@ -9,8 +9,14 @@ import imutils
 import time
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
+from io import BytesIO
+import numpy as np
+import base64
+import io
 
+from PIL import Image
 FRAME = 15
+WIDTH = 600
 
 # Load your model here
 recognition.start()
@@ -62,8 +68,8 @@ with app.app_context():
         return render_template('thongtin.html', students=db_all)
 
 
-    @app.route('/diemdanh')
-    def diemdanh():
+    @app.route('/diemdanh2')
+    def diemdanh2():
         db_all = Student.query.all()  # Lấy tất cả sinh viên để hiển thị
         socketio.start_background_task(target=gen)
         return render_template("diemdanh.html", students=db_all)
@@ -79,15 +85,36 @@ with app.app_context():
                 frame = cv2.flip(frame, 1)               
                 frame = imutils.resize(frame, width=600)
 
-                best_name, best_class_probabilities, frame = recognition.frame_recognition(frame)
-                socketio.emit('update_results', {'name': best_name, 'accuracy': best_class_probabilities})
+                best_name, best_class_probabilities, frame, bbb = recognition.frame_recognition(frame)
+                socketio.emit('update_results', {'name': best_name, 'accuracy': best_class_probabilities,'x1':bbb[0],'y1':bbb[1],'x2':bbb[2],'y2':bbb[3]})
                 ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(.1)
                     
+    # ================================== Video Feed ==================================
+    @app.route('/diemdanh')
+    def diemdanh():
+        db_all = Student.query.all()  # Lấy tất cả sinh viên để hiển thị
+        socketio.start_background_task(target=handle_frame)
+        return render_template("diemdanh2.html", students=db_all)
+        
 
+    @socketio.on('frame')
+    def handle_frame(data):
+        sid = request.sid
+        print(f'Received frame from SID: {sid}')
+        img_data = data['image']
+        img_data = base64.b64decode(img_data)
+        frame = Image.open(io.BytesIO(img_data)) 
+        img_np = np.array(frame)
+        frame = imutils.resize(img_np, width=WIDTH)
+        best_name, best_class_probabilities, frame, bbb = recognition.frame_recognition(frame)
+        # list_person = recognition.recognition_face(frame)
+        # best_name, best_class_probabilities, frame, reg_box = list_person[0]
+        socketio.emit('update_results2', {'name': best_name, 'accuracy': best_class_probabilities, 'x1':bbb[0],'y1':bbb[1],'x2':bbb[2],'y2':bbb[3] }, room=sid)
+# ================================== Video Feed ==================================
     @app.route('/video_feed')
     def video_feed():    
         return Response(gen(),mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -128,7 +155,8 @@ with app.app_context():
 
     @socketio.on('connect')
     def handle_connect():
-        print("Client connected") 
+        sid = request.sid
+        print(f'Client connected with SID: {sid}') 
 
     if __name__ == '__main__':
         # app.run(debug=True, threaded=True)

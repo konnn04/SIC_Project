@@ -58,6 +58,7 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
         if faces_found > 0:
             det = bounding_boxes[:, 0:4]
             bb = np.zeros((faces_found, 4), dtype=np.int32)
+            list_person = []
             for i in range(faces_found):
                 bb[i][0] = det[i][0]
                 bb[i][1] = det[i][1]
@@ -80,7 +81,7 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
                     best_class_probabilities = predictions[
                         np.arange(len(best_class_indices)), best_class_indices]
                     best_name = class_names[best_class_indices[0]]
-                    print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
+                    # print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
 
 
 
@@ -88,6 +89,8 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
                         cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
                         text_x = bb[i][0]
                         text_y = bb[i][3] + 20
+
+                        
 
                         name = class_names[best_class_indices[0]]
                         cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
@@ -98,12 +101,15 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
                         person_detected[best_name] += 1
                     else:
                         name = "Unknown"
+                    bbb = [bb[i][0] / frame.shape[1], bb[i][1] / frame.shape[0], bb[i][2] / frame.shape[1], bb[i][3] / frame.shape[0]]
+                    return name, best_class_probabilities[0], frame, bbb
+            #     list_person.append([best_name, best_class_probabilities[0], frame, bb[i]])
                     
-                    return best_name, best_class_probabilities[0], frame
+            # return list_person
         
-        return "Unknown", 0, frame
+        return "Unknown", 0, frame, [0, 0, 0, 0]
     except:
-        return "Unknown", 0, frame
+        return "Unknown", 0, frame, [0, 0, 0, 0]
         pass
     
 
