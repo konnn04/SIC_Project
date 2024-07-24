@@ -47,7 +47,7 @@ def load_facenet():
             person_detected = collections.Counter()
     return images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet
 
-def identify_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet):
+def recognition_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet):
     bounding_boxes, _ = align.detect_face(frame, MINSIZE, pnet, rnet, onet, THRESHOLD, FACTOR)
     faces_found = bounding_boxes.shape[0]
     try:
@@ -112,6 +112,6 @@ def start():
     model, class_names = load_model()
     images_placeholder,phase_train_placeholder, embeddings, sess, pnet, rnet, onet = load_facenet()
 
-def identify(frame):
-    return identify_face(frame, model, class_names, images_placeholder,phase_train_placeholder, embeddings, sess, pnet, rnet, onet)
+def frame_recognition(frame):
+    return recognition_face(frame, model, class_names, images_placeholder,phase_train_placeholder, embeddings, sess, pnet, rnet, onet)
 

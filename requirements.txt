@@ -3,11 +3,12 @@ torch
 tqdm
 facenet-pytorch
 imageio   
-tensorflow==1.15.0
-scipy==1.1.0
-numpy==1.16.2
+tensorflow
+scipy
+numpy
 flask-socketio
 flask
+flask_sqlalchemy
 # Path: requirements.txt
 # Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
 
