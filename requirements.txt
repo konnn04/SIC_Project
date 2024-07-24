@@ -3,6 +3,14 @@ opencv-contrib-python-headless
 matplotlib
 torch
 tqdm
-facenet_pytorch
+facenet-pytorch
+imageio   
+tensorflow==1.15.0
+scipy==1.1.0
+numpy==1.16.2
 # Path: requirements.txt
 # Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
+
+# RUN src/videoProcessing.py để tiền xử lý video
+# Tải https://drive.usercontent.google.com/download?id=1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-&export=download&authuser=0
+# Đặt vào thư mục models/ để sử dụng

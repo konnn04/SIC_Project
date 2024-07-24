@@ -5,10 +5,10 @@ from facenet_pytorch import MTCNN  # Gói phần mềm MTCNN để phát hiện 
 from datetime import datetime  
 
 # Đường dẫn chứa các thư mục ảnh sau khi chụp
-output_directory = r"F:\Year2 - HK2\SIC\FaceID\codeTK\venv\dataset\raw"
+output_directory = r"dataset\raw"
 
 # Đường dẫn chứa các folder video quay
-video_directory = r"F:\Year2 - HK2\SIC\FaceID\codeTK\venv\dataset\raw_video"
+video_directory = r"dataset\raw_video"
 
 # Tạo thư mục nếu chưa có
 if not os.path.exists(output_directory):
@@ -81,6 +81,6 @@ for video_path in pathvideo:
         os.makedirs(output_path)  # Tạo thư mục lưu hình ảnh khuôn mặt nếu chưa tồn tại
         print(f"Tạo thư mục: {output_path}")
 
-    extract_faces_from_video(video_path, output_path)  # Thực hiện cắt và lưu hình ảnh khuôn mặt từ video
+    extract_faces_from_video(video_path, output_path,200)  # Thực hiện cắt và lưu hình ảnh khuôn mặt từ video
 
 print("Hoàn thành quá trình xử lý tất cả các video.")

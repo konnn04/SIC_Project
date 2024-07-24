@@ -1,7 +1,6 @@
-dataset/processed/*
-dataset/raw/*
-dataset/raw_video/*
+dataset/*
 models/*
 venv
+.venv
 Test_file/*
 
