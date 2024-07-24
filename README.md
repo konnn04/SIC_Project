@@ -42,8 +42,7 @@ Với:
     <p>
     Mở terminal từ thư mục chính, chạy <b>"python install -r requirements.txt"</b> để cài thư viện
     </p>
-    </li>
-    
+    </li>    
     <li>
     Chuẩn bị dataset và mô hình FaceNet
     <p>Link Dataset: https://drive.google.com/drive/folders/1C9NSSUc2OFSMwHJAye6w0mQIkBoHpcpw?usp=sharing</p>
