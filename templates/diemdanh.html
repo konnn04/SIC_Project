@@ -62,18 +62,19 @@
         </table>
     </div>
     <div class="right-panel">
-        <img src="{{ url_for('video_feed') }}" width="600px">
-        <button onclick="submitImage()">Điểm danh</button>
+        <div id="cam">
+            <img src="{{ url_for('video_feed') }}" width="600px">
+        </div>
+        <div class="result">
+            <h2>Kết quả</h2>
+            <p id="result"></p>
+        </div>
+        <!-- <form action="/submit" method="post">
+            <button type="submit">Điểm danh</button>
+        </form> -->
     </div>
 </div>
-<script>
-    function submitImage() {
-        // Implement the JavaScript to capture an image from the video feed
-        // and send it to the /submit endpoint
-        // This part is left as an exercise
-        alert("Test submit image");
-    }
-</script>
+<script src="{{ url_for('static', filename='js/update-socket.js') }}"></script>
 
 </body>
 {% endblock %}
