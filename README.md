@@ -48,7 +48,8 @@ Với:
     <p>Link Dataset: https://drive.google.com/drive/folders/1C9NSSUc2OFSMwHJAye6w0mQIkBoHpcpw?usp=sharing</p>
     <p>Link Facenet: https://drive.usercontent.google.com/download?id=1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-&export=download&authuser=0</p>
     <b>Giải nén rồi đặt vô theo cây thư mục như ảnh</b>
-    ![Image](/image2.png)
+    
+![Image](/image2.png)
     </li>
     <li>
     Xử lí ảnh đầu vào
