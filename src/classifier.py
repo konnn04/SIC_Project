@@ -13,13 +13,13 @@ import pickle
 from sklearn.svm import SVC
 
 MODE = "TRAIN" # "TRAIN"or "CLASSIFY"
-MODEL_PATH = os.path.join(os.getcwd(), "models\\20180402-114759.pb")
-CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models\\classifier.pkl")
-DATA_DIR = os.path.join(os.getcwd(),"dataset\\processed")
+MODEL_PATH = os.path.join(os.getcwd(), "models/20180402-114759.pb")
+CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models/classifier.pkl")
+DATA_DIR = os.path.join(os.getcwd(),"dataset/processed")
 BATCH_SIZE = 1000
 IMAGE_SIZE = 160
 SEED = 666
-TEST_DIR = os.path.join(os.getcwd(),"dataset\\processed_test")
+TEST_DIR = os.path.join(os.getcwd(),"dataset/processed_test")
 
 def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):
   

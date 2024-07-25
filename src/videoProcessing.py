@@ -16,9 +16,9 @@ import random
 from time import sleep
 import cv2
 
-VIDEO_PATH = os.path.join(os.getcwd(), 'dataset\\raw_video')
-FRAMES_PATH = os.path.join(os.getcwd(), 'dataset\\raw_frame')
-PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset\\processed')
+VIDEO_PATH = os.path.join(os.getcwd(), 'dataset/raw_video')
+FRAMES_PATH = os.path.join(os.getcwd(), 'dataset/raw_frame')
+PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset/processed')
 
 SIZE = 160
 MARGIN  = 32
