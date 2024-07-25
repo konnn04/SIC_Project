@@ -21,6 +21,7 @@ IMAGE_SIZE = 160
 SEED = 666
 TEST_DIR = os.path.join(os.getcwd(),"dataset/processed_test")
 
+
 def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):
   
     with tf.Graph().as_default():

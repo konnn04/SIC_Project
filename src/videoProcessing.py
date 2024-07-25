@@ -7,6 +7,8 @@ from __future__ import print_function
 
 import sys
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 # import argparse
 import tensorflow as tf
 import numpy as np
@@ -15,14 +17,17 @@ import align.detect_face
 import random
 from time import sleep
 import cv2
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 VIDEO_PATH = os.path.join(os.getcwd(), 'dataset/raw_video')
 FRAMES_PATH = os.path.join(os.getcwd(), 'dataset/raw_frame')
 PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset/processed')
 
+FRAME = 15
 SIZE = 160
 MARGIN  = 32
-GPU_MEMORY_FRACTION = 1.0
+GPU_MEMORY_FRACTION = 1
 DELETE_FRAME_EXPORT = True
 
 
@@ -39,7 +44,7 @@ def delete_directory(directory_path):
     else:
         print(f"Không thấy thư mục: {directory_path}")
 
-def extract_frames_from_videos(video_dir = VIDEO_PATH, output_dir  = FRAMES_PATH, processed_dir=PROCESSED_PATH, frames_per_second=10, delete_frame_export=DELETE_FRAME_EXPORT):
+def extract_frames_from_videos(video_dir = VIDEO_PATH, output_dir  = FRAMES_PATH, processed_dir=PROCESSED_PATH, frames_per_second=FRAME, delete_frame_export=DELETE_FRAME_EXPORT):
     for label in os.listdir(video_dir):
         label_path = os.path.join(video_dir, label)        
         # Kiểm tra nếu label_path là thư mục
@@ -61,27 +66,46 @@ def extract_frames_from_videos(video_dir = VIDEO_PATH, output_dir  = FRAMES_PATH
     if delete_frame_export:
         delete_directory(FRAMES_PATH)
 
-def extract_frames(video_path, output_folder, frames_per_second=10):
+def extract_frames(video_path, output_folder, frames_per_second=10, num_threads=4):
     video_capture = cv2.VideoCapture(video_path)
+    if not video_capture.isOpened():
+        print(f"Error: Cannot open video {video_path}")
+        return
+    
     fps = int(video_capture.get(cv2.CAP_PROP_FPS))
-    interval = fps // frames_per_second
+    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    frame_interval = int(fps / frames_per_second)
     frame_count = 0
     extracted_frame_count = 0
-    while True:
+
+    def process_frame(frame_idx):
+        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
         ret, frame = video_capture.read()
-        if not ret:
-            break
-        if frame_count % interval == 0:
-            frame_filename = os.path.join(output_folder, f"frame_{extracted_frame_count:04d}.jpg")
+        if ret:
+            frame_filename = os.path.join(output_folder, f"frame_{frame_idx:04d}.jpg")
             cv2.imwrite(frame_filename, frame)
             extracted_frame_count += 1
-        frame_count += 1
+
+    frames_to_extract = range(0, total_frames, frame_interval)
+
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        executor.map(process_frame, frames_to_extract)
     video_capture.release()
+    # while True:
+    #     ret, frame = video_capture.read()
+    #     if not ret:
+    #         break
+    #     if frame_count % interval == 0:
+    #         frame_filename = os.path.join(output_folder, f"frame_{extracted_frame_count:04d}.jpg")
+    #         cv2.imwrite(frame_filename, frame)
+    #         extracted_frame_count += 1
+    #     frame_count += 1
+    # video_capture.release()
     print(f"Đã trích xuất {extracted_frame_count} khung hình từ {video_path} vào {output_folder}.")
 
 
-def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, image_size=SIZE, margin=MARGIN, random_order=False, gpu_memory_fraction=1.0, detect_multiple_faces=False):
-    sleep(random.random())
+def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, image_size=SIZE, margin=MARGIN, random_order=False, gpu_memory_fraction=0.5, detect_multiple_faces=False):
+    # sleep(random.random())
     output_dir = os.path.expanduser(output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -91,10 +115,26 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
     dataset = facenet.get_dataset(input_dir)    
     print('Tạo mạng lưới và các tham số cần thiết...')    
     with tf.Graph().as_default():
-        # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
-        sess = tf.compat.v1.Session()
-        # config=tf.ConfigProto()
-        # gpu_options=gpu_options, log_device_placement=False
+        
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        if gpus:
+            try:
+                # Thiết lập giới hạn bộ nhớ GPU
+                for gpu in gpus:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+                logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+                print(f"{len(gpus)} Physical GPUs, {len(logical_gpus)} Logical GPUs")
+            except RuntimeError as e:
+                # Xử lý lỗi nếu có
+                print(e)
+
+        # Thiết lập cấu hình phiên làm việc
+        config = tf.compat.v1.ConfigProto()
+        config.gpu_options.per_process_gpu_memory_fraction = gpu_memory_fraction
+        config.log_device_placement = False
+        
+        sess = tf.compat.v1.Session(config=config)
+        
         with sess.as_default():
             pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
     

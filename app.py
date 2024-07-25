@@ -19,7 +19,7 @@ FRAME = 15
 WIDTH = 600
 
 # Load your model here
-recognition.start()
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -110,10 +110,26 @@ with app.app_context():
         frame = Image.open(io.BytesIO(img_data)) 
         img_np = np.array(frame)
         frame = imutils.resize(img_np, width=WIDTH)
-        best_name, best_class_probabilities, frame, bbb = recognition.frame_recognition(frame)
-        # list_person = recognition.recognition_face(frame)
-        # best_name, best_class_probabilities, frame, reg_box = list_person[0]
-        socketio.emit('update_results2', {'name': best_name, 'accuracy': best_class_probabilities, 'x1':bbb[0],'y1':bbb[1],'x2':bbb[2],'y2':bbb[3] }, room=sid)
+        results = recognition.frame_recognition(frame)
+        
+        
+        
+        packet = {
+            'persons_detected':[
+            {
+                'name': person['name'],
+                'accuracy': person['accuracy'],
+                'x1': person['x1'],
+                'y1': person['y1'],
+                'x2': person['x2'],
+                'y2': person['y2'],
+            }
+            for person in results['persons_detected']
+        ],
+        # 'img': base64.b64encode(cv2.imencode('.jpg', results['img'])[1]).decode('utf-8') if results['img'] is not None else None
+        }
+        socketio.emit('update_results2', packet, room=sid)
+        # socketio.emit('update_results2', {'name': best_name, 'accuracy': best_class_probabilities, 'x1':bbb[0],'y1':bbb[1],'x2':bbb[2],'y2':bbb[3], 'img': frame_base64}, room=sid)
 # ================================== Video Feed ==================================
     @app.route('/video_feed')
     def video_feed():    
@@ -160,5 +176,6 @@ with app.app_context():
 
     if __name__ == '__main__':
         # app.run(debug=True, threaded=True)
+        recognition.start()
         init_db()
         socketio.run(app, debug=True)

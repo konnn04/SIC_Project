@@ -18,8 +18,14 @@ THRESHOLD = [0.6, 0.7, 0.7]
 FACTOR = 0.709
 IMAGE_SIZE = 182
 INPUT_IMAGE_SIZE = 160
-
+GPU_MEMORY_FRACTION = 1.0
 person_detected = collections.Counter()
+
+
+def preprocess_frame(frame):
+    
+    return frame
+
 # Load your model here
 def load_model():
     # Load The Custom Classifier
@@ -31,7 +37,7 @@ def load_model():
 def load_facenet():
     with tf.Graph().as_default():
         # Cai dat GPU neu co
-        gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.6)
+        gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=GPU_MEMORY_FRACTION)
         sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
 
         with sess.as_default():
@@ -48,9 +54,12 @@ def load_facenet():
     return images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet
 
 def recognition_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet):
+
+    frame = preprocess_frame(frame)
+
     bounding_boxes, _ = align.detect_face(frame, MINSIZE, pnet, rnet, onet, THRESHOLD, FACTOR)
     faces_found = bounding_boxes.shape[0]
-    try:
+    try: 
         # if faces_found > 1:
         #     cv2.putText(frame, "Only one face", (0, 100), cv2.FONT_HERSHEY_COMPLEX_SMALL,
         #                 1, (255, 255, 255), thickness=1, lineType=2)
@@ -58,7 +67,7 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
         if faces_found > 0:
             det = bounding_boxes[:, 0:4]
             bb = np.zeros((faces_found, 4), dtype=np.int32)
-            list_person = []
+            persons_d = []
             for i in range(faces_found):
                 bb[i][0] = det[i][0]
                 bb[i][1] = det[i][1]
@@ -82,34 +91,32 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
                         np.arange(len(best_class_indices)), best_class_indices]
                     best_name = class_names[best_class_indices[0]]
                     # print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
+                    # if best_class_probabilities < 0.8:
+                    #     best_name = "Unknown"
 
 
-
-                    if best_class_probabilities > 0.8:
-                        cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
-                        text_x = bb[i][0]
-                        text_y = bb[i][3] + 20
-
-                        
-
-                        name = class_names[best_class_indices[0]]
-                        cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                    1, (255, 255, 255), thickness=1, lineType=2)
-                        cv2.putText(frame, str(round(best_class_probabilities[0], 3)), (text_x, text_y + 17),
-                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                    1, (255, 255, 255), thickness=1, lineType=2)
-                        person_detected[best_name] += 1
-                    else:
-                        name = "Unknown"
+                    # if best_class_probabilities > 0.8:
+                    #     cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
+                    #     text_x = bb[i][0]
+                    #     text_y = bb[i][3] + 20
+                    #     name = class_names[best_class_indices[0]]
+                    #     cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    #                 1, (255, 255, 255), thickness=1, lineType=2)
+                    #     cv2.putText(frame, str(round(best_class_probabilities[0], 3)), (text_x, text_y + 17),
+                    #                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    #                 1, (255, 255, 255), thickness=1, lineType=2)
+                    #     person_detected[best_name] += 1
+                    # else:
+                    #     name = "Unknown"
                     bbb = [bb[i][0] / frame.shape[1], bb[i][1] / frame.shape[0], bb[i][2] / frame.shape[1], bb[i][3] / frame.shape[0]]
-                    return name, best_class_probabilities[0], frame, bbb
-            #     list_person.append([best_name, best_class_probabilities[0], frame, bb[i]])
-                    
-            # return list_person
+                    persons_d.append({'name':best_name,'accuracy': best_class_probabilities[0],  'x1':bbb[0],'y1': bbb[1],'x2': bbb[2],'y2': bbb[3]} )
+                    # return best_name, best_class_probabilities[0], frame, bbb
+            persons = {'persons_detected': persons_d, 'img': frame}
+            return persons    
         
-        return "Unknown", 0, frame, [0, 0, 0, 0]
+        return {'persons_detected': [], 'img': None}
     except:
-        return "Unknown", 0, frame, [0, 0, 0, 0]
+        return {'persons_detected': [], 'img': None}
         pass
     
 
@@ -120,4 +127,3 @@ def start():
 
 def frame_recognition(frame):
     return recognition_face(frame, model, class_names, images_placeholder,phase_train_placeholder, embeddings, sess, pnet, rnet, onet)
-

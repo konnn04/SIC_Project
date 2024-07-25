@@ -51,11 +51,34 @@
         right: 0;
         bottom: 0;
     }
+
+    @media screen and (max-width: 700px) {
+        .container {
+            display: block;
+        }
+        .container>div {
+            width: 100%;
+        }
+    }
 </style>
 
 <body>
 <div class="container">
     <div class="left-panel">
+        
+        <div id="cam">
+            <video id="video" width="640" height="480" autoplay></video>
+            <canvas id="canvas" width="640" height="480"></canvas>            
+        </div>
+        <div id="cam2">
+            <!-- <img id="img2" src="" alt="" srcset=""> -->
+        </div>
+        <div class="result">
+            <h2>Kết quả</h2>
+            <p id="result"></p>
+        </div>
+    </div>
+    <div class="right-panel">
         <h2>Danh sách sinh viên</h2>
         <table>
             <thead>
@@ -75,23 +98,12 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-    <div class="right-panel">
-        <div id="cam">
-            <video id="video" width="640" height="480" autoplay></video>
-            <canvas id="canvas" width="640" height="480"></canvas>            
-        </div>
-        <div class="result">
-            <h2>Kết quả</h2>
-            <p id="result"></p>
-        </div>
-        <!-- <form action="/submit" method="post">
-            <button type="submit">Điểm danh</button>
-        </form> -->
+        
     </div>
 </div>
 <script>
     const video = document.getElementById('video');
+    // const img = document.getElementById('img2');
     const cam = document.getElementById('cam');
     video.height = cam.offsetHeight;
     video.width = cam.offsetWidth;
@@ -123,7 +135,7 @@
         function startCapturing() {
             setInterval(() => {
                 captureFrame();
-            }, 200); // Chụp và gửi khung hình mỗi giây
+            }, 300); // Chụp và gửi khung hình mỗi giây
         }
 
         // Bắt đầu quá trình chụp khung hình
@@ -132,30 +144,36 @@
         // Nhận kết quả từ server
         socket.on('update_results2', (data) => {
             // console.log(data)
-            if (data) {
-                
-                let p = data.accuracy.toFixed(2)
+            if (data && data.persons_detected.length >0) {
+                const canvas = document.getElementById('canvas');
+                canvas.width = video.width;
+                canvas.height = video.height;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // img.src = `data:image/jpg;base64,${data.img}`;
                 const text = document.getElementById('result');
-                text.innerText = `Tên: ${data.name} ${data.name!="Unknown" ? `- Độ chính xác: ${p*100}%`:""}`
-                if (p<0.8) {
-                    text.style.color = 'red';
-                }else{
-                    text.style.color = 'green';
-                }
-                drawRectangles(data.x1,data.y1,data.x2,data.y2,data.name,text.style.color)
-                
-                // console.log(`Tên: ${data.name} ${data.name!="Unknown" ? `- Độ chính xác: ${p*100}%`:""}`);
-            } else {
+                text.innerText = ""
+                data.persons_detected.forEach((e,i) => {                    
+                    let p = e.accuracy.toFixed(2)
+                    const textName = `${e.name} + ${e.name!="Unknown" ? `- Độ chính xác: ${p*100}%`:""}\n`
+                    text.innerText += textName
+                    // Vẽ hình chữ nhật và tên người được nhận diện                    
+                    if (p<0.8) {
+                        text.style.color = 'red';
+                    }else{
+                        text.style.color = 'green';
+                    }
+                    drawRectangles(ctx,e.x1,e.y1,e.x2,e.y2,e.name,text.style.color)
+                    });
+            }
+            else {
                 console.log('No faces detected');
             }
         });
 
-        function drawRectangles(x1,y1,x2,y2,text,color){
-            const canvas = document.getElementById('canvas');
-            canvas.width = video.width;
-            canvas.height = video.height;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawRectangles(ctx,x1,y1,x2,y2,text,color){
+            
             ctx.strokeStyle = color; // Màu viền hình chữ nhật
             ctx.lineWidth = 2; // Độ dày của đường viền
             x1 = x1 * canvas.width;
