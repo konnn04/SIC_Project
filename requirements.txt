@@ -9,6 +9,8 @@ numpy
 flask-socketio
 flask
 flask_sqlalchemy
+scikit-learn
+imutils
 # Path: requirements.txt
 # Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
 

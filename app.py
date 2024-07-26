@@ -1,7 +1,9 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 from flask import Flask, render_template, Response, request, session, flash, redirect, url_for
 from flask_socketio import SocketIO
 import cv2
-import os
 import tensorflow.compat.v1 as tf
 import random
 import src.recognition as recognition

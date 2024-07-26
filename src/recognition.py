@@ -1,5 +1,8 @@
 import cv2
 import os
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 import numpy as np
 import pickle
 import src.facenet as facenet

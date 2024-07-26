@@ -17,8 +17,6 @@ import align.detect_face
 import random
 from time import sleep
 import cv2
-from concurrent.futures import ThreadPoolExecutor
-from threading import Lock
 
 VIDEO_PATH = os.path.join(os.getcwd(), 'dataset/raw_video')
 FRAMES_PATH = os.path.join(os.getcwd(), 'dataset/raw_frame')
@@ -27,7 +25,7 @@ PROCESSED_PATH = os.path.join(os.getcwd(), 'dataset/processed')
 FRAME = 15
 SIZE = 160
 MARGIN  = 32
-GPU_MEMORY_FRACTION = 1
+GPU_MEMORY_FRACTION = 1.0
 DELETE_FRAME_EXPORT = True
 
 
@@ -66,46 +64,31 @@ def extract_frames_from_videos(video_dir = VIDEO_PATH, output_dir  = FRAMES_PATH
     if delete_frame_export:
         delete_directory(FRAMES_PATH)
 
-def extract_frames(video_path, output_folder, frames_per_second=10, num_threads=4):
+def extract_frames(video_path, output_folder, frames_per_second=10):
     video_capture = cv2.VideoCapture(video_path)
     if not video_capture.isOpened():
         print(f"Error: Cannot open video {video_path}")
         return
     
     fps = int(video_capture.get(cv2.CAP_PROP_FPS))
-    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    frame_interval = int(fps / frames_per_second)
+    interval = fps // frames_per_second
     frame_count = 0
     extracted_frame_count = 0
-
-    def process_frame(frame_idx):
-        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+    while True:
         ret, frame = video_capture.read()
-        if ret:
-            frame_filename = os.path.join(output_folder, f"frame_{frame_idx:04d}.jpg")
+        if not ret:
+            break
+        if frame_count % interval == 0:
+            frame_filename = os.path.join(output_folder, f"frame_{extracted_frame_count:04d}.jpg")
             cv2.imwrite(frame_filename, frame)
             extracted_frame_count += 1
-
-    frames_to_extract = range(0, total_frames, frame_interval)
-
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        executor.map(process_frame, frames_to_extract)
+        frame_count += 1
     video_capture.release()
-    # while True:
-    #     ret, frame = video_capture.read()
-    #     if not ret:
-    #         break
-    #     if frame_count % interval == 0:
-    #         frame_filename = os.path.join(output_folder, f"frame_{extracted_frame_count:04d}.jpg")
-    #         cv2.imwrite(frame_filename, frame)
-    #         extracted_frame_count += 1
-    #     frame_count += 1
-    # video_capture.release()
     print(f"Đã trích xuất {extracted_frame_count} khung hình từ {video_path} vào {output_folder}.")
 
 
 def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, image_size=SIZE, margin=MARGIN, random_order=False, gpu_memory_fraction=0.5, detect_multiple_faces=False):
-    # sleep(random.random())
+    sleep(0.000001)
     output_dir = os.path.expanduser(output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -227,4 +210,5 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
 
 if __name__ == '__main__':
     extract_frames_from_videos()
+    # data_preprocessing()
 

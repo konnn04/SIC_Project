@@ -1,5 +1,6 @@
 dataset/*
 models/*
+!models/classifier.pkl
 venv
 .venv
 Test_file/*

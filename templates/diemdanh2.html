@@ -140,19 +140,21 @@
 
         // Bắt đầu quá trình chụp khung hình
         video.addEventListener('loadeddata', startCapturing);
-
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.width;
+        canvas.height = video.height;
+        const ctx = canvas.getContext('2d');
+        const text = document.getElementById('result');
         // Nhận kết quả từ server
         socket.on('update_results2', (data) => {
             // console.log(data)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (data && data.persons_detected.length >0) {
-                const canvas = document.getElementById('canvas');
-                canvas.width = video.width;
-                canvas.height = video.height;
-                const ctx = canvas.getContext('2d');
+                
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // img.src = `data:image/jpg;base64,${data.img}`;
-                const text = document.getElementById('result');
+                
                 text.innerText = ""
                 data.persons_detected.forEach((e,i) => {                    
                     let p = e.accuracy.toFixed(2)
@@ -164,15 +166,16 @@
                     }else{
                         text.style.color = 'green';
                     }
-                    drawRectangles(ctx,e.x1,e.y1,e.x2,e.y2,e.name,text.style.color)
+                    drawRectangles(ctx,e.x1,e.y1,e.x2,e.y2,e.name,p,text.style.color),p
                     });
             }
             else {
                 console.log('No faces detected');
+                 text.innerText = "Không thấy khuôn mặt",p
             }
         });
 
-        function drawRectangles(ctx,x1,y1,x2,y2,text,color){
+        function drawRectangles(ctx,x1,y1,x2,y2,text,p,color){
             
             ctx.strokeStyle = color; // Màu viền hình chữ nhật
             ctx.lineWidth = 2; // Độ dày của đường viền
@@ -185,7 +188,10 @@
             const textY = y2 + 20;
             ctx.fillStyle = color; // Màu chữ
             ctx.font = '16px Arial';
-            ctx.fillText(text, textX, textY);
+            if (p>0.8)
+                ctx.fillText(text, textX, textY);
+            else
+                ctx.fillText("Không xác định", textX, textY);
 
         }
         

@@ -1,22 +1,26 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 import tensorflow as tf
 import numpy as np
 # import argparse
 import facenet
-import os
 # import sys
 import math
 import pickle
 from sklearn.svm import SVC
 
+
+
+
 MODE = "TRAIN" # "TRAIN"or "CLASSIFY"
 MODEL_PATH = os.path.join(os.getcwd(), "models/20180402-114759.pb")
 CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models/classifier.pkl")
 DATA_DIR = os.path.join(os.getcwd(),"dataset/processed")
-BATCH_SIZE = 1000
+BATCH_SIZE = 512
 IMAGE_SIZE = 160
 SEED = 666
 TEST_DIR = os.path.join(os.getcwd(),"dataset/processed_test")
