@@ -1,7 +1,5 @@
-dataset/processed/*
-dataset/raw/*
-dataset/raw_video/*
+dataset/*
 models/*
 venv
-Face recognition data
-Data
+.venv
+Test_file/*

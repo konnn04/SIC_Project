@@ -34,5 +34,39 @@ Với:
 </ol>
 
 
-<h2>3. Lộ trình</h2>
-<h1><b>TÁCH ẢNH</b> -> VIẾT MÔ HÌNH -> TRAIN -> TEST -> TỐI ƯU -> XÂY DỰNG DATABASE -> VIẾT WEBAPP</h1>
+<h2>3. Cách cài đặt</h2>
+<i>Lưu ý: Nhớ chạy bằng môi trường ảo nha, quên là nặng máy ráng chịu. Và chừa ít nhất 6GB bộ nhớ.</i>
+<ol>
+    <li>
+    Cài đặt các thư viện cần thiết    
+    <p>
+    Mở terminal từ thư mục chính, chạy <b>"python install -r requirements.txt"</b> để cài thư viện
+    </p>
+    </li>    
+    <li>
+    Chuẩn bị dataset và mô hình FaceNet
+    <p>Link Dataset: https://drive.google.com/drive/folders/1C9NSSUc2OFSMwHJAye6w0mQIkBoHpcpw?usp=sharing</p>
+    <p>Link Facenet: https://drive.usercontent.google.com/download?id=1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-&export=download&authuser=0</p>
+    <b>Giải nén rồi đặt vô theo cây thư mục như ảnh</b>
+    
+![Image](/image2.png)
+    </li>
+    <li>
+    Xử lí ảnh đầu vào
+    </p>
+    Từ terminal, chạy <b>"python src/videoProcessing.py"</b> để bắt đầu tách frame ảnh và xử lí ảnh đầu vào. Nó sẽ tốn khá nhiều thời gian.... (Sẽ tối ưu sau)
+    </p>
+    </li>
+    <li>
+    Train phân lớp mô hình
+    </p>
+    Tiếp tục, chạy <b>"python src/classifier.py"</b> để bắt đầu train mô hình (Cũng không lâu lắm, sẽ tối ưu sau)
+    </p>
+    </li>
+    <li>
+    Test lên web
+    </p>
+    Chạy <b>"py app.py"</b> để xem thành phẩm
+    </p>
+    </li>
+</ol>

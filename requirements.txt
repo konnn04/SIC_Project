@@ -1,5 +1,17 @@
-opencv-python-headless
-opencv-contrib-python-headless
-
-# Path: requirements-dev.txt
+matplotlib
+torch
+tqdm
+facenet-pytorch
+imageio   
+tensorflow
+scipy
+numpy
+flask-socketio
+flask
+flask_sqlalchemy
+# Path: requirements.txt
 # Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
+
+# RUN src/videoProcessing.py để tiền xử lý video
+# Tải https://drive.usercontent.google.com/download?id=1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-&export=download&authuser=0
+# Đặt vào thư mục models/ để sử dụng
