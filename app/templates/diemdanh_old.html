@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+
+{% block content %} 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        display: flex;
+        height: 100vh;
+    }
+    .left-panel {
+        flex: 1;
+        padding: 20px;
+        background-color: #f0f0f0;
+        overflow-y: auto;
+    }
+    .right-panel {
+        flex: 1;
+        padding: 20px;
+        background-color: #e0e0e0;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+
+<body>
+<div class="container">
+    <div class="left-panel">
+        <h2>Danh sách sinh viên</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sinh viên</th>
+                    <th>MSSV</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.svname }}</td>
+                    <td>{{ student.mssv }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="right-panel">
+        <div id="cam">
+            <img src="{{ url_for('video_feed') }}" width="600px">
+        </div>
+        <div class="result">
+            <h2>Kết quả</h2>
+            <p id="result"></p>
+        </div>
+        <!-- <form action="/submit" method="post">
+            <button type="submit">Điểm danh</button>
+        </form> -->
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/update-socket.js') }}"></script>
+
+</body>
+{% endblock %}
+
+
+    

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 import tensorflow as tf
 import numpy as np
@@ -26,14 +26,11 @@ SEED = 666
 TEST_DIR = os.path.join(os.getcwd(),"dataset/processed_test")
 
 
-def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):
-  
-    with tf.Graph().as_default():
-      
-        with tf.compat.v1.Session() as sess:
-            
-            np.random.seed(seed=seed)
-            
+def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):  
+    with tf.Graph().as_default():      
+        with tf.compat.v1.Session() as sess:      
+            # Read the dataset and split it into a training and test set     
+            np.random.seed(seed=seed)            
             if use_split_dataset:
                 dataset_tmp = facenet.get_dataset(data_dir)
                 train_set, test_set = split_dataset(dataset_tmp, min_nrof_images_per_class, nrof_train_images_per_class)
@@ -44,12 +41,7 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
                     dataset = test_set
             else:
                 dataset = facenet.get_dataset(data_dir)
-
-            # Kiểm tra phải có ít nhất 1 ảnh để phân lớp
-            # for cls in dataset:
-            #     assert(len(cls.image_paths)>0, 'Phải có ít nhất 1 ảnh cho môi lớp trong thư mục dữ liệu')
-
-                 
+             
             paths, labels = facenet.get_image_paths_and_labels(dataset)
             
             print('Số lớp (nhãn): %d' % len(dataset))
@@ -76,23 +68,27 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
                 paths_batch = paths[start_index:end_index]
                 images = facenet.load_data(paths_batch, False, False, image_size)
                 feed_dict = { images_placeholder:images, phase_train_placeholder:False }
-                emb_array[start_index:end_index,:] = sess.run(embeddings, feed_dict=feed_dict)
-            
-            classifier_filename_exp = os.path.expanduser(classifier_filename)
+                emb_array[start_index:end_index,:] = sess.run(embeddings, feed_dict=feed_dict)            
 
             if (mode=='TRAIN'):
                 # Train classifier
-                print('Training phân lớp')
-                model = SVC(kernel='linear', probability=True)
+                if os.path.exists(classifier_filename):
+                    # Load existing classifier
+                    with open(classifier_filename, 'rb') as infile:
+                        (model, class_names, old_emb_array, old_labels) = pickle.load(infile)
+                    print("Loaded existing classifier from", classifier_filename)
+                    emb_array = np.concatenate((old_emb_array, emb_array))
+                    labels = np.concatenate((old_labels, labels))
+                else:                
+                    # Use SVM classifier to train the model 
+                    model = SVC(kernel='linear', probability=True)                   
+                    class_names = [ cls.name for cls in dataset]
+                # Training classifier
                 model.fit(emb_array, labels)
-            
-                # Create a list of class names
-                class_names = [ cls.name.replace('_', ' ') for cls in dataset]
-
                 # Saving classifier model
-                with open(classifier_filename_exp, 'wb') as outfile:
-                    pickle.dump((model, class_names), outfile)
-                print('Đã lưu mô hình phân lớp thành công! "%s"' % classifier_filename_exp)
+                with open(classifier_filename, 'wb') as outfile:
+                    pickle.dump((model, class_names, emb_array, labels), outfile)
+                print('Đã lưu mô hình phân lớp thành công! "%s"' % classifier_filename)
                 
             elif (mode=='CLASSIFY'):
                 # Classify images

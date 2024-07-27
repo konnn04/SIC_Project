@@ -1,9 +1,9 @@
 matplotlib
-torch
+# torch
 tqdm
-facenet-pytorch
+# facenet-pytorchD:\_TEST\SIC_Project\requirements.txt
 imageio   
-tensorflow
+tensorflow[and-cuda]
 scipy
 numpy
 flask-socketio
@@ -11,9 +11,5 @@ flask
 flask_sqlalchemy
 scikit-learn
 imutils
-# Path: requirements.txt
-# Cài đặt các thư viện cần thiết bằng lệnh pip install -r requirements.txt
-
-# RUN src/videoProcessing.py để tiền xử lý video
-# Tải https://drive.usercontent.google.com/download?id=1EXPBSXwTaqrSC0OhUdXNmKSh9qJUQ55-&export=download&authuser=0
-# Đặt vào thư mục models/ để sử dụng
+imgaug
+opencv-python

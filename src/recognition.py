@@ -1,8 +1,8 @@
 import cv2
 import os
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 import numpy as np
 import pickle
 import src.facenet as facenet
@@ -33,7 +33,7 @@ def preprocess_frame(frame):
 def load_model():
     # Load The Custom Classifier
     with open(CLASSIFIER_PATH, 'rb') as file:
-        model, class_names = pickle.load(file)
+        model, class_names,_,__= pickle.load(file)
     print("Custom Classifier, Successfully loaded")
     return model, class_names
 
@@ -123,9 +123,9 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
         pass
     
 
-def start():
+def init():
     global model, class_names, images_placeholder, embeddings, sess, pnet, rnet, onet, phase_train_placeholder
-    model, class_names = load_model()
+    model, class_names= load_model()
     images_placeholder,phase_train_placeholder, embeddings, sess, pnet, rnet, onet = load_facenet()
 
 def frame_recognition(frame):
