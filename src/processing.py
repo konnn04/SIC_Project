@@ -61,7 +61,7 @@ def augment_image(image):
         iaa.Fliplr(0.5),  # Lật ảnh theo chiều ngang
         iaa.Affine(rotate=(-15, 15)),  # Xoay ảnh 45 độ
         iaa.MultiplyBrightness((0.6, 1.4)),  # Độ sáng thay đổi ngẫu nhiên
-        iaa.AdditiveGaussianNoise(scale=(0, 0.08*255))  # Thêm nhiễu Gaussian
+        # iaa.AdditiveGaussianNoise(scale=(0, 0.08*255))  # Thêm nhiễu Gaussian
     ])
     # Thực hiện tất cả các phép biến đổi trên ảnh
     image_aug = seq(image=image)

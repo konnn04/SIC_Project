@@ -20,19 +20,24 @@ MODE = "TRAIN" # "TRAIN"or "CLASSIFY"
 MODEL_PATH = os.path.join(os.getcwd(), "models/20180402-114759.pb")
 CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models/classifier.pkl")
 DATA_DIR = os.path.join(os.getcwd(),"dataset/processed")
-BATCH_SIZE = 512
+BATCH_SIZE = 1024
 IMAGE_SIZE = 160
 SEED = 666
 TEST_DIR = os.path.join(os.getcwd(),"dataset/processed_test")
+# Số ảnh tối thiểu trong mỗi lớp
+MIN_NROF_IMAGES_PER_CLASS = 20
+# Số ảnh train trong mỗi lớp
+NROF_TRAIN_IMAGES_PER_CLASS = 12
 
 
-def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=10):  
+def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier_filename=CLASSIFIER_FILENAME, use_split_dataset=False, test_data_dir=TEST_DIR, batch_size=BATCH_SIZE, image_size=IMAGE_SIZE, seed=SEED, min_nrof_images_per_class=20, nrof_train_images_per_class=NROF_TRAIN_IMAGES_PER_CLASS):  
     with tf.Graph().as_default():      
         with tf.compat.v1.Session() as sess:      
             # Read the dataset and split it into a training and test set     
             np.random.seed(seed=seed)            
             if use_split_dataset:
                 dataset_tmp = facenet.get_dataset(data_dir)
+                # lấy ra 2 tập train và test từ dataset gốc với số ảnh tối thiểu là min_nrof_images_per_class và số ảnh train là nrof_train_images_per_class
                 train_set, test_set = split_dataset(dataset_tmp, min_nrof_images_per_class, nrof_train_images_per_class)
                 # dataset = train_set
                 if (mode=='TRAIN'):
@@ -53,6 +58,7 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
             
             # Get input and output tensors
             images_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("input:0")
+            
             embeddings = tf.compat.v1.get_default_graph().get_tensor_by_name("embeddings:0")
             phase_train_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("phase_train:0")
             embedding_size = embeddings.get_shape()[1]
@@ -93,10 +99,10 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
             elif (mode=='CLASSIFY'):
                 # Classify images
                 print('Testing classifier')
-                with open(classifier_filename_exp, 'rb') as infile:
+                with open(classifier_filename, 'rb') as infile:
                     (model, class_names) = pickle.load(infile)
 
-                print('Loaded classifier model from file "%s"' % classifier_filename_exp)
+                print('Loaded classifier model from file "%s"' % classifier_filename)
 
                 predictions = model.predict_proba(emb_array)
                 best_class_indices = np.argmax(predictions, axis=1)
@@ -123,4 +129,5 @@ def split_dataset(dataset, min_nrof_images_per_class, nrof_train_images_per_clas
 
             
 if __name__ == '__main__':
-    classifier()
+    classifier(mode="TRAIN")
+    # classifier(mode="CLASSIFY")

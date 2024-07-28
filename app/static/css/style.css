@@ -1,25 +1,33 @@
+:root{
+    --text: #ffffff; 
+    --primary-color: #19bdbe;
+    --secondary-color: #ffd66d;
+    --tertiary-color: #001715;
+    --quaternary-color: #ffffff;
+}
+
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    color: #fff;
 }
 
-
 body {
-    background: url('/static/images/AI_pic.jpg');
-    
+    background: url('/static/images/bg.gif');
+    background-attachment: fixed;    
     background-repeat: no-repeat;
     background-size: cover;
-    
+    background-position: center;
 } 
 
 
 .header-container {
-    background-color: rgba(65, 208, 248, 0.8);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    
+    padding: 20px;    
     border-radius: 10px;
     /* position: relative; */
 }
@@ -29,7 +37,7 @@ body {
 .header-container h2 {
     text-align: center;
     margin-top: 20px;
-    color: #009970;
+    color: var(--text);
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     font-weight: bold;
     
@@ -77,21 +85,25 @@ body {
 
 .navbar-brand {
     font-weight: bold;
-    color: #009970;
+    color: var(--text);
+}
+
+.navbar-brand:focus, .navbar-brand:hover {
+    color: unset;
 }
 
 .nav-link {
-    color: #333333;
+    color: var(--text);
     font-weight: 500;
     transition: color 0.3s ease;
 }
-
+/* 
 .nav-link:hover, .nav-link.active {
     color: #009970;
-}
+} */
 
 .login-button {
-    background-color: #009970;
+    background-color: var(--primary-color);
     color: #ffffff;
     font-size: 14px;
     padding: 8px 20px;
@@ -101,7 +113,7 @@ body {
 }
 
 .login-button:hover {
-    background-color: #007d5c;
+    background-color: #2a90bf;
     transform: translateY(-2px);
 }
 
@@ -116,7 +128,7 @@ body {
 }
 
 .navbar-nav .nav-item .nav-link {
-    color: #333; /* Màu chữ mặc định */
+    color: var(--text); /* Màu chữ mặc định */
     padding: 10px 20px;
     margin: 5px 0;
     transition: all 0.3s ease;
@@ -125,19 +137,42 @@ body {
 
 .navbar-nav .nav-item .nav-link:hover {
     color: #fff; /* Màu chữ khi hover */
-    background-color: #007bff; /* Màu nền khi hover, bạn có thể thay đổi màu này */
+    background-color: var(--primary-color);/* Màu nền khi hover, bạn có thể thay đổi màu này */
     transform: translateY(-2px); /* Hiệu ứng nâng nhẹ khi hover */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ */
 }
 
 /* Nếu bạn muốn giữ màu active cho mục menu hiện tại */
-.navbar-nav .nav-item .nav-link.active {
+/* .navbar-nav .nav-item .nav-link.active {
     color: #190202;
-     /* Màu nền cho mục active */
-}
+} */
 
 /* Tùy chọn: Thêm hiệu ứng khi click */
 .navbar-nav .nav-item .nav-link:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"], input[type="password"], select {
+    /* width: 100%; */
+    padding: 8px;
+    /* margin: 10px 0; */
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table, th, td {
+    border: 1px solid #cccccc;
+}
+
+th, td {
+    padding: 5px;
+    text-align: left;
 }

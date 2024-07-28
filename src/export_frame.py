@@ -11,7 +11,7 @@ import os
 import cv2
 
 VIDEO_PATH = os.path.join(os.getcwd(), 'dataset/raw_video')
-FRAMES_PATH = os.path.join(os.getcwd(), 'dataset/raw_frame')
+FRAMES_PATH = os.path.join(os.getcwd(), 'dataset/raw_frame') 
 
 FRAME_COUNT = 150
 MARGIN  = 32

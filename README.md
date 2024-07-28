@@ -70,3 +70,5 @@ Với:
     </p>
     </li>
 </ol>
+
+<p>Tạo csdl: flask db init -> flask db migrate -m "Initial migration." -> flask db upgrade</p>
