@@ -56,7 +56,12 @@
         font-size: 16px;
     }
 
-    @media screen and (max-width: 800px) {
+    .container-table{
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    @media screen and (max-width: 900px) {
         .container {
             display: block;
         }
@@ -85,28 +90,30 @@
     </div>
     <div class="right-panel">
         <h2>Danh sách sinh viên</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>MSSV</th>
-                    <th>Họ tên</th>
-                    <th>Mã lớp</th>
-                    <th>Thời gian</th>
-                </tr>
-            </thead>
-            <tbody id="table">
-                {% for student in students_checkin %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ student.student_id }}</td>
-                    <td>{{ student.svlname}} {{ student.svfname}}</td>
-                    <td>{{ student.class_id }}</td>
-                    <td>{{ student.date}} {{ student.time}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="container-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>MSSV</th>
+                        <th>Họ tên</th>
+                        <th>Mã lớp</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody id="table">
+                    {% for student in students_checkin %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.svlname}} {{ student.svfname}}</td>
+                        <td>{{ student.class_id }}</td>
+                        <td>{{ student.date}} {{ student.time}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <form action="{{ url_for('diemdanh_diemdanh.delete') }}" method="post" style="display:inline;">
             <button type="submit">Xóa tất cả</button>
         </form>

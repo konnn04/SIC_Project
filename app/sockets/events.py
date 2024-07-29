@@ -9,9 +9,10 @@ import src.recognition as recognition
 import time
 from datetime import datetime
 from app import Label, db, Student, StudentCheckIn
+from sqlalchemy.orm import joinedload
 
 last_processed_time = {}
-COOLDOWN_PERIOD = 0.5
+COOLDOWN_PERIOD = 1
 
 @socketio.on('connect')
 def handle_connect():
@@ -48,25 +49,29 @@ def handle_frame(data):
                 if StudentCheckIn.query.filter_by(student_id=student_id, date=date_time.date()).first() is None:
                     student_check = StudentCheckIn(student_id=student_id,date = date_time.date(), time = date_time.time())
                     db.session.add(student_check)
-                    db.session.commit()
                     update = True
-    packet = {
-        'persons_detected':[
-        {
-            'name': person['name'],
+    persons_detected = []
+    person_names = [person['name'] for person in results['persons_detected']]
+    students =  Student.query.join(Label).filter(Label.label_name.in_(person_names)).options(joinedload(Student.labels)).all()
+    student_dict = {label.label_name: student for student in students for label in student.labels}
+    for person in results['persons_detected']:        
+        q = student_dict.get(person['name'])
+        persons_detected.append({
             'accuracy': person['accuracy'],
             'x1': person['x1'],
             'y1': person['y1'],
             'x2': person['x2'],
             'y2': person['y2'],
-        }
-        for person in results['persons_detected']
-    ],
+            'name': q.svlname +" "+q.svfname if q is not None else 'Unknown'
+        })
+    packet = {
+        'persons_detected': persons_detected,
         'update': update
     }
     socketio.emit('update_results2', packet, room=sid)
 
     if update:
+        db.session.commit()
         students = Student.query.join(StudentCheckIn).filter(StudentCheckIn.student_id == Student.student_id).with_entities(Student.student_id, Student.svfname, Student.svlname, Student.class_id, StudentCheckIn.date, StudentCheckIn.time).all()
         students = [
             {
@@ -79,7 +84,7 @@ def handle_frame(data):
             for student in students
         ]
         students.sort(key=lambda x: x['date_time'], reverse=True)
-        socketio.emit('update_checkin_students', students, room=sid)
+        socketio.emit('update_checkin_students', students)
    
 
 # Thêm các SocketIO event handlers khác tại đây

@@ -9,7 +9,6 @@ let currentStream = null;
 // Khởi tạo socket
 const socket = io();
 
-let size = 2000;
 
 const ping = new Audio('./static/audio/snap-sound.mp3');
 
@@ -49,8 +48,7 @@ function startCapturing() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             text.innerText = "";
         }
-    },size/1000); // Chụp và gửi khung hình mỗi giây
-    console.log();
+    },200); // Chụp và gửi khung hình mỗi giây
 }
 
 // Bắt đầu quá trình chụp khung hình
@@ -62,6 +60,15 @@ canvas.height = video.height;
 const ctx = canvas.getContext('2d');
 const text = document.getElementById('result');
 // Nhận kết quả từ server
+
+window.onresize = ()=>{
+    video.height = cam.offsetHeight;
+    video.width = cam.offsetWidth;
+    canvas.width = video.width;
+    canvas.height = video.height;
+}
+
+
 socket.on('update_checkin_students', (data) => {
     tbody = document.getElementById('table');
     tbody.innerHTML = "";
@@ -118,7 +125,8 @@ function drawRectangles(ctx,x1,y1,x2,y2,text,p,color){
         ctx.fillText("Không xác định", textX, textY);
 }
 // Khởi tạo camera mặc định và các camera khác nếu có 
-function populateCameraOptions() {
+async function populateCameraOptions() {
+    await navigator.mediaDevices.getUserMedia({ video: true });
     navigator.mediaDevices.enumerateDevices()
         .then(devices => {
             const videoSelect = document.getElementById('cameraSelect');
@@ -159,9 +167,6 @@ function switchCamera(cameraId) {
             currentStream = stream;
             video.srcObject = stream;
 
-            video.onloadedmetadata = () => {
-                size = video.videoHeight *  video.videoWidth;
-            };
         })
         .catch(error => {
             console.error('Error accessing camera:', error);

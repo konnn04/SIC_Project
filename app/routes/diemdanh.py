@@ -17,4 +17,5 @@ def diemdanh():
 def delete():
     db.session.query(StudentCheckIn).delete()   
     db.session.commit()
-    return redirect(url_for('diemdanh_diemdanh.diemdanh'))
+    socketio.emit('update_checkin_students', [])
+    return redirect(url_for('diemdanh_diemdanh.diemdanh')) 
