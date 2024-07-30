@@ -22,6 +22,7 @@ FACTOR = 0.709
 IMAGE_SIZE = 182
 INPUT_IMAGE_SIZE = 160
 GPU_MEMORY_FRACTION = 1.0
+RATE_ACCURACY = 0.9
 person_detected = collections.Counter()
 
 
@@ -56,7 +57,7 @@ def load_facenet():
             person_detected = collections.Counter()
     return images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet
 
-def recognition_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet):
+def recognition_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet, paint=True, rate_accuracy=RATE_ACCURACY):
 
     frame = preprocess_frame(frame)
 
@@ -98,28 +99,26 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
                     #     best_name = "Unknown"
 
 
-                    # if best_class_probabilities > 0.8:
-                    #     cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
-                    #     text_x = bb[i][0]
-                    #     text_y = bb[i][3] + 20
-                    #     name = class_names[best_class_indices[0]]
-                    #     cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    #                 1, (255, 255, 255), thickness=1, lineType=2)
-                    #     cv2.putText(frame, str(round(best_class_probabilities[0], 3)), (text_x, text_y + 17),
-                    #                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    #                 1, (255, 255, 255), thickness=1, lineType=2)
-                    #     person_detected[best_name] += 1
-                    # else:
-                    #     name = "Unknown"
+                    if paint==True:
+                        cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
+                        text_x = bb[i][0]
+                        text_y = bb[i][3] + 20
+                        name = "Unknown"
+                        if best_class_probabilities > rate_accuracy:
+                            name = class_names[best_class_indices[0]]
+                        cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,1, (255, 255, 255), thickness=1, lineType=2)
+                        cv2.putText(frame, str(round(best_class_probabilities[0], 3)), (text_x, text_y + 17),cv2.FONT_HERSHEY_COMPLEX_SMALL,1, (255, 255, 255), thickness=1, lineType=2)
+                        person_detected[best_name] += 1
+                    
                     bbb = [bb[i][0] / frame.shape[1], bb[i][1] / frame.shape[0], bb[i][2] / frame.shape[1], bb[i][3] / frame.shape[0]]
                     persons_d.append({'name':best_name,'accuracy': best_class_probabilities[0],  'x1':bbb[0],'y1': bbb[1],'x2': bbb[2],'y2': bbb[3]} )
                     # return best_name, best_class_probabilities[0], frame, bbb
             persons = {'persons_detected': persons_d, 'img': frame}
             return persons    
         
-        return {'persons_detected': [], 'img': None}
+        return {'persons_detected': [], 'img': frame}
     except:
-        return {'persons_detected': [], 'img': None}
+        return {'persons_detected': [], 'img': frame}
         pass
     
 

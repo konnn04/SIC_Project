@@ -4,4 +4,9 @@ models/*
 venv
 .venv
 Test_file/*
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+*.zip
 

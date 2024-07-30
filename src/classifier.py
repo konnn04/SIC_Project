@@ -13,9 +13,6 @@ import math
 import pickle
 from sklearn.svm import SVC
 
-
-
-
 MODE = "TRAIN" # "TRAIN"or "CLASSIFY"
 MODEL_PATH = os.path.join(os.getcwd(), "models/20180402-114759.pb")
 CLASSIFIER_FILENAME = os.path.join(os.getcwd(),"models/classifier.pkl")
@@ -100,7 +97,7 @@ def classifier(mode = MODE, data_dir=DATA_DIR, model_path=MODEL_PATH, classifier
                 # Classify images
                 print('Testing classifier')
                 with open(classifier_filename, 'rb') as infile:
-                    (model, class_names) = pickle.load(infile)
+                    (model, class_names, emb_array, labels) = pickle.load(infile)
 
                 print('Loaded classifier model from file "%s"' % classifier_filename)
 
