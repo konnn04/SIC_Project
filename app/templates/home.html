@@ -12,19 +12,20 @@
                 {% endfor %}
             {% endif %}
         {% endwith %} -->
-        <section class="hero">
+        <section class="hero fade-in" data-aos="fade-up">
             <h1>Nhận Diện Khuôn Mặt Hiệu Quả và Chính Xác</h1>
-            <p>Công nghệ nhận diện khuôn mặt hàng đầu giúp bảo vệ và quản lý thông tin cá nhân của bạn một cách an toàn.</p>
-            <button>Bắt đầu ngay</button>
+            <p>Dự án nhóm xây dựng mô hình nhận diện khuôn mặt qua webcam thực tế, đa khuôn mặt</p>
+            <p>Chào mừng đến với hệ thống điểm danh bằng khuôn mặt, giải pháp hiện đại và tiện ích cho việc quản lý sự hiện diện.<br> Hệ thống này không chỉ cung cấp phương pháp điểm danh tự động mà còn nâng cao tính bảo mật và hiệu quả trong quản lý nhân sự và học sinh.</p>
+            
         </section>
-    
-        <section class="features">
+        
+        <section class="features fade-in" data-aos="fade-left">
             <h2>Các Tính Năng Nổi Bật</h2>
             <div class="feature-list">
                 <div class="feature">
                     <i class="fas fa-bullseye"></i>
                     <h3>Độ Chính Xác Cao</h3>
-                    <p>Đảm bảo độ chính xác lên tới 99%.</p>
+                    <p>Đảm bảo độ chính xác lên tới 95%.</p>
                 </div>
                 <div class="feature">
                     <i class="fas fa-tachometer-alt"></i>
@@ -38,8 +39,8 @@
                 </div>
             </div>
         </section>
-    
-        <section class="pricing">
+        
+        <section class="pricing fade-in" data-aos="fade-up">
             <h2>Gói Dịch Vụ</h2>
             <div class="plan">
                 <h3>Gói Cơ Bản</h3>
@@ -52,6 +53,7 @@
                 <button>Đăng ký</button>
             </div>
         </section>
+        
     
         <footer>
             <div class="quick-links">
@@ -64,15 +66,32 @@
             <div class="contact-info">
                 <p>Email: ou@ou.edu.vn</p>
                 <p>Phone: 028-38364748</p>
-                <p>Address: 123 Main Street, City, Country</p>
+                <p>Address: Ho Chi Minh City Open University, VietNam</p>
             </div>
             <div class="social-media">
-                <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.facebook.com/TruongDaiHocMo" class="facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
                 <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
             </div>
             <p>&copy; 2024 FaceRecog. All rights reserved.</p>
         </footer>
 </div>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const elements = document.querySelectorAll('.fade-in');
+  
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      });
+  
+      elements.forEach(element => {
+        observer.observe(element);
+      });
+    });
+  </script>
+  
 {% endblock %}
