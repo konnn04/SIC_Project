@@ -4,14 +4,75 @@
 {% block content %} 
 
 <div>
-    <h2> This is Home Page </h2>
+    <!-- <h2> This is Home Page </h2>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for m in messages %}
                     <p>{{ m }}</p>
                 {% endfor %}
             {% endif %}
-        {% endwith %}
+        {% endwith %} -->
+        <section class="hero">
+            <h1>Nhận Diện Khuôn Mặt Hiệu Quả và Chính Xác</h1>
+            <p>Công nghệ nhận diện khuôn mặt hàng đầu giúp bảo vệ và quản lý thông tin cá nhân của bạn một cách an toàn.</p>
+            <button>Bắt đầu ngay</button>
+        </section>
+    
+        <section class="features">
+            <h2>Các Tính Năng Nổi Bật</h2>
+            <div class="feature-list">
+                <div class="feature">
+                    <i class="fas fa-bullseye"></i>
+                    <h3>Độ Chính Xác Cao</h3>
+                    <p>Đảm bảo độ chính xác lên tới 99%.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Tốc Độ Nhanh</h3>
+                    <p>Nhận diện trong thời gian ngắn.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-lock"></i>
+                    <h3>Bảo Mật Cao</h3>
+                    <p>Dữ liệu của bạn được bảo vệ tuyệt đối.</p>
+                </div>
+            </div>
+        </section>
+    
+        <section class="pricing">
+            <h2>Gói Dịch Vụ</h2>
+            <div class="plan">
+                <h3>Gói Cơ Bản</h3>
+                <p>$10/tháng</p>
+                <button>Đăng ký</button>
+            </div>
+            <div class="plan">
+                <h3>Gói Nâng Cao</h3>
+                <p>$30/tháng</p>
+                <button>Đăng ký</button>
+            </div>
+        </section>
+    
+        <footer>
+            <div class="quick-links">
+                <a href="#">Trang chủ</a>
+                <a href="#">Giới thiệu</a>
+                <a href="#">Dịch vụ</a>
+                <a href="#">Blog</a>
+                <a href="#">Liên hệ</a>
+            </div>
+            <div class="contact-info">
+                <p>Email: ou@ou.edu.vn</p>
+                <p>Phone: 028-38364748</p>
+                <p>Address: 123 Main Street, City, Country</p>
+            </div>
+            <div class="social-media">
+                <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p>&copy; 2024 FaceRecog. All rights reserved.</p>
+        </footer>
 </div>
 
 {% endblock %}

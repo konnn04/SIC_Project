@@ -3,7 +3,7 @@ matplotlib
 tqdm
 # facenet-pytorchD:\_TEST\SIC_Project\requirements.txt
 imageio   
-tensorflow[and-cuda]
+tensorflow
 scipy
 numpy
 flask-socketio
@@ -12,4 +12,4 @@ flask_sqlalchemy
 scikit-learn
 imutils
 imgaug
-opencv-python
+opencv_python

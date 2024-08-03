@@ -120,7 +120,7 @@ def recognition_face(frame, model, class_names, images_placeholder, phase_train_
     except:
         return {'persons_detected': [], 'img': frame}
         pass
-    
+   
 
 def init():
     global model, class_names, images_placeholder, embeddings, sess, pnet, rnet, onet, phase_train_placeholder
