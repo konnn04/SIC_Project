@@ -1,4 +1,4 @@
-from app import db, Student, Class, Label, Teacher, StudentAccount, StudentInClass, TeacherAccount, TeacherInClass
+from app import db, Student, Class, Label, Teacher, Account, StudentInClass, TeacherInClass
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from datetime import datetime
 from flask_login import login_required, current_user
@@ -35,7 +35,7 @@ def add_student():
         address = request.form["address"]
         
         student = Student(idStudent=student_id, fname=svfname, lname=svlname, sex= sex, dob=birthdate, address=address)
-        student_acc = StudentAccount(id = student_id, password = "1")
+        student_acc = Account(id = student_id, password = "1234")
         db.session.add(student,student_acc)
         db.session.commit()
         flash("Cập nhật thông tin thành công!")
@@ -61,7 +61,7 @@ def add_teacher():
         address = request.form["address"]
         
         teacher = Teacher(idTeacher=teacher_id, fname=svfname, lname=svlname, sex= sex, dob=birthdate, address=address)
-        teacher_acc = TeacherAccount(id = teacher_id, password = '1')
+        teacher_acc = Account(id = teacher_id, password = '1234')
         db.session.add(teacher,teacher_acc)
         db.session.commit()
         flash("Cập nhật thông tin thành công!")
@@ -100,7 +100,7 @@ def delete_student(student_id):
     if student:
         db.session.delete(student)
         
-        s = StudentAccount.query.get(student_id)
+        s = Account.query.get(student_id)
         if s:
             db.session.delete(s)
         db.session.commit()
@@ -119,7 +119,7 @@ def delete_teacher(teacher_id):
     teacher = Teacher.query.get(teacher_id)
     if teacher:
         db.session.delete(teacher)
-        s = TeacherAccount.query.get(teacher_id)
+        s = Account.query.get(teacher_id)
         if s:
             db.session.delete(s)
         db.session.commit()

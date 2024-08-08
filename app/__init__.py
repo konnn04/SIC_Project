@@ -50,19 +50,9 @@ class Teacher(db.Model):
     dob = db.Column(db.Date, nullable=False)
     address = db.Column(db.String, nullable=False)
 
-    teacher_accounts = db.relationship('TeacherAccount', back_populates='teacher')
+    teacher_accounts = db.relationship('Account', back_populates='teacher',cascade='all, delete-orphan')
     classes = db.relationship('TeacherInClass', back_populates='teacher', cascade='all, delete-orphan')
-    
-class TeacherAccount(db.Model, UserMixin):
-    __tablename__ = 'teacheraccount'
-    id = db.Column(db.String, db.ForeignKey('teacher.idTeacher'), primary_key=True, nullable=False)
-    password = db.Column(db.String, nullable=False)    
-
-    teacher = db.relationship('Teacher', back_populates='teacher_accounts')
-
-    def check_password(self, password):
-        return self.password == password
-
+ 
 class StudentInClass(db.Model):
     __tablename__ = 'student_in_class'
     idClass = db.Column(db.String, db.ForeignKey('class_.idClass'), nullable=False, primary_key=True)
@@ -70,8 +60,6 @@ class StudentInClass(db.Model):
 
     class_ = db.relationship('Class', back_populates='students_class')
     student = db.relationship('Student', back_populates='classes')
-
-
 
 class Student(db.Model):
     __tablename__ = 'student'
@@ -82,17 +70,31 @@ class Student(db.Model):
     dob = db.Column(db.Date, nullable=False)
     address = db.Column(db.String, nullable=False)
     
-    student_accounts = db.relationship('StudentAccount', back_populates='student', cascade='all, delete-orphan')
+    student_accounts = db.relationship('Account', back_populates='student', cascade='all, delete-orphan')
     classes = db.relationship('StudentInClass', back_populates='student', cascade='all, delete-orphan')
     labels = db.relationship('Label', back_populates='student', cascade='all, delete-orphan')
     attendances = db.relationship('Attendance', back_populates='student', cascade='all, delete-orphan')
+   
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    idAdmin = db.Column(db.String, primary_key=True)
+    fname = db.Column(db.String, nullable=False)
+    lname = db.Column(db.String, nullable=False)
+    sex = db.Column(db.String, nullable=False)
+    dob = db.Column(db.Date, nullable=True)
+    address = db.Column(db.String, nullable=False)
 
-class StudentAccount(db.Model, UserMixin):
-    __tablename__ = 'studentaccount'
-    id = db.Column(db.String, db.ForeignKey("student.idStudent"), primary_key=True, nullable=False)
-    password = db.Column(db.String, nullable=False)    
+    admin_accounts = db.relationship('Account', back_populates='admin', cascade='all, delete-orphan')
+
+class Account(db.Model, UserMixin):
+    __tablename__ = 'account'
+    id = db.Column(db.String, primary_key=True, nullable=False)
+    password = db.Column(db.String, nullable=False) 
+    # user_type = db.Column(db.String, nullable=False)   
 
     student = db.relationship('Student', back_populates='student_accounts')
+    teacher = db.relationship('Teacher', back_populates='teacher_accounts')
+    admin = db.relationship('Admin', back_populates='admin_accounts')
 
     def check_password(self, password):
         return self.password == password
@@ -112,19 +114,6 @@ class Attendance(db.Model):
     time = db.Column(db.Time, nullable=False)
     # 
     student = db.relationship('Student', back_populates='attendances')
-
-class AdminAccount(db.Model, UserMixin):
-    __tablename__ = 'adminaccount'
-    id = db.Column(db.String, primary_key=True)
-    password = db.Column(db.String, nullable=False)
-
-    def check_password(self, password):
-        return self.password == password
-
-# def init_db():
-#     with app.app_context():
-#         db.create_all()        
-#         print("Các bảng cơ sở dữ liệu đã được tạo.")
 
 # Import routes và socket events
 from app.sockets import events
@@ -151,17 +140,9 @@ register_blueprints(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    admin_account = AdminAccount.query.get(user_id)
-    if admin_account:
-        return admin_account
-    
-    teacher_account = TeacherAccount.query.get(user_id)
-    if teacher_account:
-        return teacher_account
-    
-    student_account = StudentAccount.query.get(user_id)
-    if student_account:
-        return student_account
+    account = Account.query.get(user_id)
+    if account:
+        return account
     return None
 
 
