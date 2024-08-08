@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for,flash
+from flask import Blueprint, render_template, redirect, url_for,flash, request
 from app import  socketio, Label
 from app.sockets.events import handle_frame, handle_upload
 from datetime import date
@@ -7,7 +7,7 @@ from tool import get_role
 
 upload_bp = Blueprint('upload', __name__)
 
-@upload_bp.route('/upload')
+@upload_bp.route('/upload', methods = ["POST","GET"])
 @login_required
 def upload():
     if (get_role()!='student'):
@@ -15,7 +15,8 @@ def upload():
         return redirect(url_for("home_home.home"))
     socketio.start_background_task(target=handle_upload)
 
-    label = Label.query.filter_by(idStudent=current_user.id).first()
+    if (request.method == "GET"):
+        label = Label.query.filter_by(idStudent=current_user.id).first()
     if (label is None):
         flash("Bạn chưa cập nhật sinh trắc học, vui lòng thực hiện!")
         return render_template('upload.html', status = 'none')

@@ -14,20 +14,20 @@ def login():
 
         userStudent = StudentAccount.query.get(user_name)
         if userStudent and userStudent.check_password(password):
-            login_user(userStudent)            
+            login_user(userStudent, remember=True)            
             flash("You Logged in successfully!!!", "info")
             return redirect(url_for("home_home.home"))
 
 
         userAdmin = AdminAccount.query.get(user_name)
         if userAdmin and userAdmin.check_password(password):
-            login_user(userAdmin)            
+            login_user(userAdmin, remember=True)            
             flash("You Logged in successfully!!!", "info")
             return redirect(url_for("home_home.home"))
                     
         userTeacher = TeacherAccount.query.get(user_name)
         if userTeacher and userTeacher.check_password(password):
-            login_user(userTeacher)            
+            login_user(userTeacher, remember=True)            
             flash("You Logged in successfully!!!", "info")
             return redirect(url_for("home_home.home"))
         
