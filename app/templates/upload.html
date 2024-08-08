@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+
+{% block content %} 
+<style>
+    .container{
+        position: relative;
+    }
+
+    #camera{
+        position: absolute;
+        background-color: #fff;
+        top:0;
+        left: 0;
+        right: 0;
+        height: 90vh;
+        display: none;
+    }
+
+    #camera.show{
+        display: block;
+    }
+
+    .process{
+        width: 100%;
+        height: 20px;
+        background-color: #f0f0f0;
+        position: relative;
+        border: 1px solid #000000;
+    }
+
+    #process{
+        width: 0;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #00ff00;
+    }
+
+    #cam{
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        /* height: 100%; */
+        max-width: 90vw;
+        max-height: 70vh;
+        margin: auto;
+    }
+
+    #cam *{
+        position: absolute;
+        top: 0;
+        
+    }
+</style>
+
+<body>
+<div class="container">
+    <h1>NHẬP DỮ LIỆU KHUÔN MẶT</h1>
+    <p><b>Tình trạng dữ liệu:</b> Chưa nhập khuôn mặt</p>
+
+    <button id="import">Nhập khuôn mặt?</button>
+    <button id="delete">Gửi yêu cầu thay đổi khuôn mặt</button>
+
+    <div id="camera">
+        <h2>Camera</h2>
+        <div id="cam">
+            <video id="video" width="640" height="480" autoplay></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+
+        <p>Lưu ý: Đảm bảo môi trường đủ sáng, đặt mặt vừa khuôn mặt</p>
+        <div class="control-box">
+            <select id="cameraSelect" title="Chọn camera" >
+            </select>
+            <button id="capture">Bắt đầu quay</button>
+        </div>
+        <p>Tiến trình:</p>
+        <div class="process"> 
+            <div id="process"></div>
+        </div>
+        <form action="{{upload_upload.upload}}" method="post"></form>
+    </div>
+
+    
+</div>
+<script>
+    const status = {{status | tojson}}
+</script>
+<script src="{{ url_for('static',filename='js/upload.js')}}"></script>
+</body>
+{% endblock %}
+
+
+<!-- python src/export_frame.py
+python src/processing.py
+python src/classifier.py -->

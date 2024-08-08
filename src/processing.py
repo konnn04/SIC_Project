@@ -29,32 +29,6 @@ SIZE = 160
 MARGIN  = 32
 GPU_MEMORY_FRACTION = 1.0
 
-# def delete_directory(directory_path):
-#     # Kiểm tra nếu đường dẫn tồn tại
-#     if os.path.exists(directory_path):
-#         for root, dirs, files in os.walk(directory_path, topdown=False):
-#             for name in files:
-#                 os.remove(os.path.join(root, name))
-#             for name in dirs:
-#                 os.rmdir(os.path.join(root, name))
-#         os.rmdir(directory_path)
-#         print(f"Đã xóa: {directory_path}")
-#     else:
-#         print(f"Không thấy thư mục: {directory_path}")
-
-def is_face_too_tilted(det):
-    # Hàm kiểm tra khuôn mặt bị nghiêng dựa trên bounding box
-    x1, y1, x2, y2 = det
-    width = x2 - x1
-    height = y2 - y1
-    aspect_ratio = width / height
-    return aspect_ratio < 0.5 or aspect_ratio > 1.5  # Ngưỡng độ nghiêng có thể điều chỉnh
-
-def is_face_within_frame(det, img_shape):
-    x1, y1, x2, y2 = det
-    img_height, img_width = img_shape[:2]
-    return x1 >= 0 and y1 >= 0 and x2 <= img_width and y2 <= img_height
-
 def augment_image(image):
     # Tạo chuỗi các phép biến đổi
     seq = iaa.Sequential([
@@ -65,7 +39,7 @@ def augment_image(image):
     ])
     # Thực hiện tất cả các phép biến đổi trên ảnh
     image_aug = seq(image=image)
-    return image_aug
+    return [image,image_aug],["original","augment"]
 
 def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, image_size=SIZE, margin=MARGIN, random_order=False, gpu_memory_fraction=0.5, detect_multiple_faces=False):
     sleep(0.000000001)
@@ -140,7 +114,7 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                             img = facenet.to_rgb(img)
                         img = img[:,:,0:3]
                         #Ảnh gốc và ảnh được tăng cường dữ liệu
-                        augmented_img = [augment_image(img)]+[img] # Tăng cường dữ liệu
+                        augmented_img, notes = augment_image(img) # Tăng cường dữ liệu
                         
                         for index_a, img in enumerate(augmented_img):
                             bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
@@ -164,9 +138,7 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                                     det_arr.append(np.squeeze(det))
                                 #đánh dấu khuôn mặt
                                 for i, det in enumerate(det_arr):
-                                    if is_face_too_tilted(det) or not is_face_within_frame(det, img.shape):
-                                        print('❌"%s"' % ['augment','original'][index_a])
-                                        continue                                       
+                                                                          
                                     det = np.squeeze(det)
                                     bb = np.zeros(4, dtype=np.int32)
                                     bb[0] = np.maximum(det[0]-margin/2, 0)
@@ -181,12 +153,12 @@ def data_preprocessing(input_dir = FRAMES_PATH, output_dir = PROCESSED_PATH, ima
                                     nrof_successfully_aligned += 1
                                     filename_base, file_extension = os.path.splitext(output_filename)
                                     if detect_multiple_faces:
-                                        output_filename_n = "{}_{}_{}{}".format(filename_base, ['augment','original'][index_a],i, file_extension)
+                                        output_filename_n = "{}_{}_{}{}".format(filename_base, notes[index_a],i, file_extension)
                                     else:
-                                        output_filename_n = "{}_{}{}".format(filename_base,['augment','original'][index_a], file_extension)
+                                        output_filename_n = "{}_{}{}".format(filename_base,notes[index_a], file_extension)
                                     imageio.imwrite(output_filename_n, scaled)
                                     text_file.write('%s %d %d %d %d\n' % (output_filename_n, bb[0], bb[1], bb[2], bb[3]))
-                                    print('✅"%s"' % ['augment','original'][index_a])
+                                    print('✅"%s"' % notes[index_a])
                             else:
                                 print('❌"%s"' % image_path)
                                 text_file.write('%s\n' % (output_filename))

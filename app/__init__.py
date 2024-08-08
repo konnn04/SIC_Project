@@ -1,7 +1,7 @@
 
 import os
-from flask import Flask, Blueprint
-
+from flask import Flask, Blueprint, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 from flask_socketio import SocketIO
@@ -14,62 +14,117 @@ app = Flask(__name__)
 
 # Khởi tạo SocketIO
 socketio = SocketIO(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login_login.login'
 
 #bao mat
 app.config["SECRET_KEY"] = "tri"
 app.permanent_session_lifetime = timedelta(minutes=1)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-def init_db():
-    with app.app_context():
-        db.create_all()        
-        print("Các bảng cơ sở dữ liệu đã được tạo.")
-
 
 class Class(db.Model):
-    __tablename__ = 'class'
-    class_id = db.Column(db.String(50), primary_key=True)
-    class_name = db.Column(db.String(50), nullable=False)
-    students = db.relationship('Student', backref='class_', cascade='all, delete-orphan')
+    __tablename__ = 'class_'
+    idClass = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    # relationship
+    teachers_class = db.relationship('TeacherInClass', back_populates='class_', cascade='all, delete-orphan')
+    students_class = db.relationship('StudentInClass', back_populates='class_', cascade='all, delete-orphan')
+    
+class TeacherInClass(db.Model):
+    __tablename__ = 'teacher_in_class'
+    idClass = db.Column(db.String, db.ForeignKey('class_.idClass'), nullable=False, primary_key=True)
+    idTeacher = db.Column(db.String, db.ForeignKey('teacher.idTeacher'), nullable=False, primary_key=True)
+    
+    class_ = db.relationship('Class', back_populates='teachers_class')
+    teacher = db.relationship('Teacher', back_populates='classes')
 
-    def __repr__(self):
-        return f'<Class {self.class_name}>'
+class Teacher(db.Model):
+    __tablename__ = 'teacher'
+    idTeacher = db.Column(db.String, primary_key=True)
+    fname = db.Column(db.String, nullable=False)
+    lname = db.Column(db.String, nullable=False)
+    sex = db.Column(db.String, nullable=False)
+    dob = db.Column(db.Date, nullable=False)
+    address = db.Column(db.String, nullable=False)
+
+    teacher_accounts = db.relationship('TeacherAccount', back_populates='teacher')
+    classes = db.relationship('TeacherInClass', back_populates='teacher', cascade='all, delete-orphan')
+    
+class TeacherAccount(db.Model, UserMixin):
+    __tablename__ = 'teacheraccount'
+    id = db.Column(db.String, db.ForeignKey('teacher.idTeacher'), primary_key=True, nullable=False)
+    password = db.Column(db.String, nullable=False)    
+
+    teacher = db.relationship('Teacher', back_populates='teacher_accounts')
+
+    def check_password(self, password):
+        return self.password == password
+
+class StudentInClass(db.Model):
+    __tablename__ = 'student_in_class'
+    idClass = db.Column(db.String, db.ForeignKey('class_.idClass'), nullable=False, primary_key=True)
+    idStudent = db.Column(db.String, db.ForeignKey('student.idStudent'), nullable=False, primary_key=True)
+
+    class_ = db.relationship('Class', back_populates='students_class')
+    student = db.relationship('Student', back_populates='classes')
+
+
 
 class Student(db.Model):
     __tablename__ = 'student'
-    student_id = db.Column(db.Integer, primary_key=True)
-    svfname = db.Column(db.String(100), nullable=False)
-    svlname = db.Column(db.String(100), nullable=False)
-    sex = db.Column(db.String(10), nullable=False)
-    birthdate = db.Column(db.Date, nullable=False)
-    address = db.Column(db.String(200), nullable=False)
-    class_id = db.Column(db.String(50), db.ForeignKey('class.class_id'), nullable=False)
+    idStudent = db.Column(db.String, primary_key=True)
+    fname = db.Column(db.String, nullable=False)
+    lname = db.Column(db.String, nullable=False)
+    sex = db.Column(db.String, nullable=False)
+    dob = db.Column(db.Date, nullable=False)
+    address = db.Column(db.String, nullable=False)
     
-    # Relationship với bảng Class     
-    labels = db.relationship('Label', backref='student', cascade='all, delete-orphan', lazy=True)
-    student_checkins = db.relationship('StudentCheckIn', backref='student', cascade='all, delete-orphan', lazy=True)
+    student_accounts = db.relationship('StudentAccount', back_populates='student', cascade='all, delete-orphan')
+    classes = db.relationship('StudentInClass', back_populates='student', cascade='all, delete-orphan')
+    labels = db.relationship('Label', back_populates='student', cascade='all, delete-orphan')
+    attendances = db.relationship('Attendance', back_populates='student', cascade='all, delete-orphan')
 
-    def __repr__(self):
-        return f'<Student {self.svname}>'
+class StudentAccount(db.Model, UserMixin):
+    __tablename__ = 'studentaccount'
+    id = db.Column(db.String, db.ForeignKey("student.idStudent"), primary_key=True, nullable=False)
+    password = db.Column(db.String, nullable=False)    
 
-class StudentCheckIn(db.Model):
-    __tablename__ = 'student_checkin'
-    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), primary_key=True, nullable=False)
-    date = db.Column(db.Date,primary_key=True, nullable=False)
-    time = db.Column(db.Time,  nullable=False)
+    student = db.relationship('Student', back_populates='student_accounts')
 
-    def __repr__(self):
-        return f'<StudentCheckIn {self.student_id} {self.date} {self.time}>'
-    
+    def check_password(self, password):
+        return self.password == password
+
 class Label(db.Model):
     __tablename__ = 'label'
-    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), primary_key=True, nullable=False)
-    label_name = db.Column(db.String(50), primary_key=True,nullable=False)
+    idStudent = db.Column(db.String, db.ForeignKey('student.idStudent'), primary_key=True)
+    dataName = db.Column(db.String, nullable=False)
+    status = db.Column(db.String, nullable=False)
 
-    def __repr__(self):
-        return f'<Label {self.label_name}>'
+    student = db.relationship('Student', back_populates='labels')
+
+class Attendance(db.Model):
+    __tablename__ = 'attendance'
+    idStudent = db.Column(db.String, db.ForeignKey('student.idStudent'), primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    time = db.Column(db.Time, nullable=False)
+    # 
+    student = db.relationship('Student', back_populates='attendances')
+
+class AdminAccount(db.Model, UserMixin):
+    __tablename__ = 'adminaccount'
+    id = db.Column(db.String, primary_key=True)
+    password = db.Column(db.String, nullable=False)
+
+    def check_password(self, password):
+        return self.password == password
+
+# def init_db():
+#     with app.app_context():
+#         db.create_all()        
+#         print("Các bảng cơ sở dữ liệu đã được tạo.")
 
 # Import routes và socket events
 from app.sockets import events
@@ -92,3 +147,23 @@ def register_blueprints(app):
 
 # Đăng ký Blueprints cho ứng dụng Flask
 register_blueprints(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    admin_account = AdminAccount.query.get(user_id)
+    if admin_account:
+        return admin_account
+    
+    teacher_account = TeacherAccount.query.get(user_id)
+    if teacher_account:
+        return teacher_account
+    
+    student_account = StudentAccount.query.get(user_id)
+    if student_account:
+        return student_account
+    return None
+
+
+
+

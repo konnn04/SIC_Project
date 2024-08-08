@@ -1,76 +1,25 @@
-{% extends "base.html" %}
-{% block title %} Login Page {% endblock %}
+{% extends "base.html"%} {% block title %}login{% endblock %}
 
 {% block content %}
-<style>
-    body {
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-    }
-
-    .login-container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 300px;
-        text-align: center;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .login-container h2 {
-        margin-bottom: 20px;
-    }
-
-    .login-container input {
-        width: calc(100% - 20px);
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    .login-container button {
-        width: 100%;
-        padding: 10px;
-        background-color: #007BFF;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .login-container button:hover {
-        background-color: #0056b3;
-    }
-
-    .message {
-        color: red;
-        margin-bottom: 10px;
-    }
-</style>
-
-<body>
-    <div class="login-container">
-        <h2>This is Login Page</h2>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for m in messages %}
-                    <p class="message">{{ m }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form action="#" method="post">
-            <input type="text" name="name" placeholder="Enter your name">
-            <input type="password" name = "password" placeholder="Enter your password">
-            <button type="submit">Login</button>
-        </form>
+<form action="{{ url_for('login_login.login') }}" method="POST">
+    <h3 align="center">Login</h3>
+    <div class="form-group">
+        <label for="id">Your ID</label>
+        <input type="text" class="form-control"
+        id="id"
+        name="id"
+        placeholder="id"
+        />
     </div>
-</body>
+    <div>
+        <label for="password">Password</label>
+        <input type="password" class="form-control"
+        id="password"
+        name ="password"
+        placeholder="Enter password"
+        />
+    </div>
+        <br/>
+        <button type="submit" class="btn btn-primary">Login</button>
+</form>
 {% endblock %}

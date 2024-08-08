@@ -1,9 +1,9 @@
-from flask import Blueprint, session, flash, redirect, url_for
-
+from flask import Blueprint, flash, redirect, url_for
+from flask_login import logout_user, login_required
 logout_bp = Blueprint('logout', __name__)
 
-logout_bp.route("/logout")
-def log_out():
-    flash("You Logged Out!!!", "info")
-    session.pop("user", None)
-    return redirect(url_for("home"))
+@logout_bp.route("/logout")
+@login_required
+def logout():
+    logout_user()   
+    return redirect(url_for('login_login.login'))

@@ -31,9 +31,9 @@ def preprocess_frame(frame):
     return frame
 
 # Load your model here
-def load_model():
+def load_model(path = CLASSIFIER_PATH):
     # Load The Custom Classifier
-    with open(CLASSIFIER_PATH, 'rb') as file:
+    with open(path, 'rb') as file:
         model, class_names,_,__= pickle.load(file)
     print("Custom Classifier, Successfully loaded")
     return model, class_names
@@ -57,6 +57,28 @@ def load_facenet():
             person_detected = collections.Counter()
     return images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet
 
+def face_detection(frame, pnet, rnet, onet): 
+    bounding_boxes, _ = align.detect_face(frame, MINSIZE, pnet, rnet, onet, THRESHOLD, FACTOR)
+    faces_found = bounding_boxes.shape[0]
+    if faces_found >1:
+        return {'error': 'Only one face!!!'}   
+    if faces_found > 0:
+        det = bounding_boxes[:, 0:4]
+        bb = np.zeros((faces_found, 4), dtype=np.int32)
+        bb[0][0] = det[0][0]
+        bb[0][1] = det[0][1]
+        bb[0][2] = det[0][2]
+        bb[0][3] = det[0][3]
+        if (bb[0][3]-bb[0][1])/frame.shape[0]>0.25:
+            cropped = frame[bb[0][1]:bb[0][3], bb[0][0]:bb[0][2], :]
+            scaled = cv2.resize(cropped, (INPUT_IMAGE_SIZE, INPUT_IMAGE_SIZE),
+                                interpolation=cv2.INTER_CUBIC)
+            return {'face': scaled, 'bb': [e/frame.shape[(i+1) % 2] for i,e in enumerate(bb[0])]}
+        return {'error': 'Face too small!!!'}
+    return {'error': 'No face found!!!'}
+            
+
+    
 def recognition_face(frame, model, class_names, images_placeholder, phase_train_placeholder, embeddings, sess, pnet, rnet, onet, paint=True, rate_accuracy=RATE_ACCURACY):
 
     frame = preprocess_frame(frame)

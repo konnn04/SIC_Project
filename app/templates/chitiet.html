@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+
+{% block content %} 
+
+<h1>Thông tin chi tiết sinh viên</h1>
+<div class="container">
+    <div id="left">
+        <form action="{{ url_for('chitiet_chitiet.save', student_id=student.idStudent) }}" method="post">
+            <div class="form-group">
+                <label for="student_id">Mã sinh viên</label>
+                <input type="text" id="student_id" value="{{ student.idStudent }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="student_lname">Họ</label>
+                <input type="text" id="student_lname" value="{{ student.lname }}" >
+            </div>
+            <div class="form-group">
+                <label for="student_fname">Tên</label>
+                <input type="text" id="student_fname" value="{{ student.fname }}" >
+            </div>
+            <div class="form-group">
+                <label for="student_birthday">Ngày sinh</label>
+                <input type="text" id="student_birthday" value="{{ student.dob }}" >
+            </div>
+            <div class="form-group">
+                <label for="student_address">Địa chỉ</label>
+                <input type="text" id="student_address" value="{{ student.address }}" >
+            </div>
+            <div class="form-group">
+                <button title="" type="submit">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+    <div id="right">
+        <h2>Sinh viên thuộc lớp</h2>
+        <table>
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã lớp</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class in joined_class %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ class.idClass }}</td>
+                    <td>
+                        <form action="{{ url_for('chitiet_chitiet.delete_class', student_id=student.idStudent, class_id=class.idClass) }}" method="post" style="display:inline;">
+                            <button type="submit">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <label for="add_class">Thêm lớp</label>
+        <form action="{{ url_for('chitiet_chitiet.add_class', student_id=student.idStudent)}}" method="post">
+            <select name="add_class" id="add_class" required>
+                <option value="" >Chọn lớp</option>
+                {% for class in unjoin_class %}
+                <option value="{{ class.idClass }}">{{ class.idClass }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Thêm</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

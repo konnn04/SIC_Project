@@ -54,9 +54,9 @@
 <div class="nav-info">
     <label for="editor_select">Quản lý: </label>
     <select name="edit" id="editor_select" title="Chọn phiên quản lý">
-        <option value="student">Sinh viên</option>
         <option value="class">Lớp học</option>
-        <option value="class">Nhãn</option>
+        <option value="student">Sinh viên</option>
+        <option value="teacher">Giáo viên</option>
     </select>
 </div>
 
@@ -72,7 +72,6 @@
                             <th>Họ tên</th>
                             <th>Giới tính</th>
                             <th>Ngày sinh</th>
-                            <th>Lớp</th>
                             <th>Nhãn</th>
                             <th></th>
                         </tr>
@@ -81,15 +80,18 @@
                         {% for student in students %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>{{ student.student_id }}</td>
-                            <td>{{ student.svlname}} {{student.svfname}}</td>
+                            <td>{{ student.idStudent }}</td>
+                            <td>{{ student.lname}} {{student.fname}}</td>
                             <td>{{ student.sex }}</td>
-                            <td>{{ student.birthdate }}</td>
-                            <td>{{ student.class_id }}</td>
-                            <td>{{ student.label_name }}</td>
+                            <td>{{ student.dob }}</td>
+                            <td>{{ student.dataName}}</td>
+                             
                             <td>
-                                <form action="{{ url_for('thongtin_thongtin.delete_student', student_id=student.student_id) }}" method="post" style="display:inline;">
+                                <form action="{{ url_for('quanly_quanly.delete_student', student_id=student.idStudent) }}" method="post" style="display:inline;">
                                     <button type="submit">Xóa</button>
+                                </form>
+                                <form action="{{ url_for('chitiet_chitiet.chitiet', student_id=student.idStudent) }}" method="post" style="display:inline;">
+                                    <button type="submit">Chi tiết</button>
                                 </form>
                             </td>
                         </tr>
@@ -106,7 +108,7 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}   
-            <form action="{{ url_for('thongtin_thongtin.add_student') }}" method="POST">
+            <form action="{{ url_for('quanly_quanly.add_student') }}" method="POST">
                 <div class="form-group">
                     <label for="s_mssv">MSSV</label>
                     <input type="text" id="s_mssv" name="student_id" placeholder="225105xxxx" required>
@@ -134,18 +136,8 @@
                     <label for="s_address">Địa chỉ</label>
                     <input type="text" id="s_address" name="address" placeholder="Phuoc Kien, Nha Be, Ho Chi Minh City" required>
                 </div>
-                <div class="form-group">
-                    <label for="s_class">Lớp</label>
-                    <select name="class_id" id="s_class" required>
-                        {% for class in classes %}
-                        <option value="{{ class.class_id }}">{{ class.class_id }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="s_label">Nhãn (Nếu có)</label>
-                    <input type="text" id="s_label" name="label_name" placeholder="NhatAnh (Nếu có)">
-                </div>
+                
+               
                 <div class="form-group">
                     <button type="submit">Save Student</button>
                 </div>
@@ -172,10 +164,10 @@
                         {% for class in classes %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>{{ class.class_id }}</td>
-                            <td>{{ class.class_name }}</td>
+                            <td>{{ class.idClass }}</td>
+                            <td>{{ class.name }}</td>
                             <td>
-                                <form action="{{ url_for('thongtin_thongtin.delete_class', class_id=class.class_id) }}" method="post" style="display:inline;">
+                                <form action="{{ url_for('quanly_quanly.delete_class', class_id=class.idClass) }}" method="post" style="display:inline;">
                                     <button type="submit">Xóa</button>
                                 </form>
                             </td>
@@ -193,7 +185,7 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}   
-            <form action="{{ url_for('thongtin_thongtin.add_class') }}" method="POST">
+            <form action="{{ url_for('quanly_quanly.add_class') }}" method="POST">
                 <div class="form-group">
                     <label for="c_id">Mã lớp</label>
                     <input type="text" id="c_id" name="class_id" placeholder="22IT03" required>
@@ -210,28 +202,130 @@
     </div>
 </div>
 
+<div class="teacher-container">    
+    <div class="container">
+        <div class="left">
+            <div class="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã GV</th>
+                            <th>Họ tên</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ teacher.idTeacher }}</td>
+                            <td>{{ teacher.lname}} {{teacher.fname}}</td>
+                            <td>{{ teacher.sex }}</td>
+                            <td>{{ teacher.dob }}</td>
+                             
+                            <td>
+                                <form action="{{ url_for('quanly_quanly.delete_teacher', teacher_id=teacher.idTeacher) }}" method="post" style="display:inline;">
+                                    <button type="submit">Xóa</button>
+                                </form>
+                                <form action="{{ url_for('chitiet_gv_chitiet_gv.chitiet_gv', teacher_id=teacher.idTeacher) }}" method="post" style="display:inline;">
+                                    <button type="submit">Chi tiết</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>            
+        </div>
+        <div class="right">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for m in messages %}
+                        <p class="message">{{ m }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}   
+            <form action="{{ url_for('quanly_quanly.add_teacher') }}" method="POST">
+                <div class="form-group">
+                    <label for="t_mssv">MSSV</label>
+                    <input type="text" id="t_mssv" name="teacher_id" placeholder="GV0001" required>
+                </div>
+                <div class="form-group">
+                    <label for="t_lname">Họ</label>
+                    <input type="text" id="t_lname" name="svlname" placeholder="Nguyễn Văn" required>
+                </div>
+                <div class="form-group">
+                    <label for="t_fname">Tên</label>
+                    <input type="text" id="t_fname" name="svfname" placeholder="A" required>
+                </div>
+                <div class="form-group">
+                    <label for="t_sex">Giới tính</label>
+                    <select name="sex" id="t_sex" required>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="t_dob">Ngày sinh</label>
+                    <input type="date" id="t_dob" name="birthdate" required>
+                </div>
+                <div class="form-group">
+                    <label for="t_address">Địa chỉ</label>
+                    <input type="text" id="t_address" name="address" placeholder="Phuoc Kien, Nha Be, Ho Chi Minh City" required>
+                </div>
+               
+               
+                <div class="form-group">
+                    <button type="submit">Save Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>
+ 
 <script>
     const editorSelect = document.getElementById('editor_select');
     const studentContainer = document.querySelector('.student-container');
     const classContainer = document.querySelector('.class-container');
+    const teacherContainer = document.querySelector('.teacher-container');
 
     editorSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'student') {
+        if (editorSelect.value === 'student') {
             studentContainer.style.display = 'block';
+            teacherContainer.style.display = 'none';
             classContainer.style.display = 'none';
-        } else {
+        }
+        if (editorSelect.value === 'class') {
             studentContainer.style.display = 'none';
+            teacherContainer.style.display = 'none';
             classContainer.style.display = 'block';
+        }
+        if (editorSelect.value === 'teacher') {
+            studentContainer.style.display = 'none';
+            teacherContainer.style.display = 'block';
+            classContainer.style.display = 'none';
         }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
         if (editorSelect.value === 'student') {
             studentContainer.style.display = 'block';
+            teacherContainer.style.display = 'none';
             classContainer.style.display = 'none';
-        } else {
+        }
+        if (editorSelect.value === 'class') {
             studentContainer.style.display = 'none';
+            teacherContainer.style.display = 'none';
             classContainer.style.display = 'block';
+        }
+        if (editorSelect.value === 'teacher') {
+            studentContainer.style.display = 'none';
+            teacherContainer.style.display = 'block';
+            classContainer.style.display = 'none';
         }
     });
 

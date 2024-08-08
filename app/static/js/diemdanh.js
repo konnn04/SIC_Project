@@ -9,6 +9,7 @@ let currentStream = null;
 // Khởi tạo socket
 const socket = io();
 
+let aspectRatio = video.width / video.height;
 
 const ping = new Audio('./static/audio/snap-sound.mp3');
 
@@ -62,6 +63,7 @@ const text = document.getElementById('result');
 // Nhận kết quả từ server
 
 window.onresize = ()=>{
+    aspectRatio = video.width / video.height;
     video.height = cam.offsetHeight;
     video.width = cam.offsetWidth;
     canvas.width = video.width;
@@ -74,7 +76,8 @@ socket.on('update_checkin_students', (data) => {
     tbody.innerHTML = "";
     data.forEach((element,i) => {
         tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td>${element.student_id}</td><td>${element.svlname} ${element.svfname}</td><td>${element.class_id}</td><td>${element.date_time}</td>`;
+        tr.innerHTML = `<td>${i+1}</td><td>${element.student_id}</td><td>${element.lname} ${element.fname}</td><td>${element.date_time}</td>`;
+        // <td>${element.class_id}</td>
         tbody.appendChild(tr);
     });
 })
@@ -166,7 +169,7 @@ function switchCamera(cameraId) {
         .then(stream => {
             currentStream = stream;
             video.srcObject = stream;
-
+            aspectRatio = video.width / video.height;
         })
         .catch(error => {
             console.error('Error accessing camera:', error);
