@@ -1,5 +1,5 @@
 from flask import request, session, flash, render_template, redirect, url_for, Blueprint
-from app import db, Account
+from app import db, AdminAccount, TeacherAccount, StudentAccount
 # from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_login import login_user, current_user
 login_bp = Blueprint('login', __name__)
@@ -12,9 +12,22 @@ def login():
         user_name = request.form["id"]
         password = request.form["password"]
 
-        user = Account.query.get(user_name)
-        if user and user.check_password(password):
-            login_user(user, remember=True)            
+        userStudent = StudentAccount.query.get(user_name)
+        if userStudent and userStudent.check_password(password):
+            login_user(userStudent, remember=True)            
+            flash("You Logged in successfully!!!", "info")
+            return redirect(url_for("home_home.home"))
+
+
+        userAdmin = AdminAccount.query.get(user_name)
+        if userAdmin and userAdmin.check_password(password):
+            login_user(userAdmin, remember=True)            
+            flash("You Logged in successfully!!!", "info")
+            return redirect(url_for("home_home.home"))
+                    
+        userTeacher = TeacherAccount.query.get(user_name)
+        if userTeacher and userTeacher.check_password(password):
+            login_user(userTeacher, remember=True)            
             flash("You Logged in successfully!!!", "info")
             return redirect(url_for("home_home.home"))
         

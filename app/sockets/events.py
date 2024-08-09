@@ -114,11 +114,10 @@ def handle_upload(data):
 
     if sid in save_temp:
         n = save_temp[sid]['len']
-        if n>=100:
-            return 
         Image.fromarray(results['face']).save(os.path.join(save_temp[sid]['path'], f'{n}.jpg'))
         save_temp[sid]['len']+=1
-        
+        if n>=100:
+            return 
         socketio.emit('update_result', {'status': 'success', 'message': 'Upload success', 'bb': results['bb'],'progress':save_temp[sid]['len'] / 100})
     else:
         save_temp[sid] = {
