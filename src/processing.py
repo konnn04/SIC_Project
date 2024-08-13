@@ -12,6 +12,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = "0"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Tắt các cảnh báo không quan trọng
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'  # Cho phép TensorFlow sử dụng GPU một cách linh hoạt
 # import argparse
+sys.path.append(os.path.join(os.getcwd(), 'src'))
 import tensorflow as tf
 import numpy as np
 import facenet

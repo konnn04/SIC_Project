@@ -4,6 +4,7 @@ from app.sockets.events import handle_frame
 from datetime import date
 from flask_login import login_required, current_user
 from tool import get_role
+import os
 
 diemdanh_bp = Blueprint('diemdanh', __name__)
 
@@ -15,7 +16,9 @@ def diemdanh():
     if (get_role()!= "teacher"):
         flash("Bạn không có quyền truy cập trang này!")
         return redirect(url_for("home_home.home"))
-    
+    if (not os.path.isfile('models/classifier.pkl') or Label.query.filter_by(status='done').count() <2):
+        flash("Chưa có dữ liệu để điểm danh! Phải từ 2 trở lên")
+        return redirect(url_for("home_home.home"))
     today = date.today()
     db_all = db.session.query(Student.idStudent, Student.fname, Student.lname, Attendance.date,Attendance.time).\
         join(Attendance, Attendance.idStudent == Student.idStudent).all()

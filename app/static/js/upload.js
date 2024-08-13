@@ -140,12 +140,13 @@ function drawRectangles(ctx,x1,y1,x2,y2){
     y2 = y2 * canvas.height;
     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 }
+ 
 
-if (status != 'none') {
-    import_btn.style.display = 'none'
-}
-
+ 
 window.onload = ()=>{
+    if (status != 'none' && status != 'reject') {
+        import_btn.style.display = 'none'
+    } 
     delete_btn.style.display = 'none'
 }
 

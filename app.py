@@ -8,6 +8,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask import redirect, url_for
 from datetime import timedelta
 
+
+
 def init_db():
     db.create_all()
     print("Các bảng cơ sở dữ liệu đã được tạo.")
@@ -44,5 +46,9 @@ if __name__ == '__main__':
     with app.app_context():
         # db.create_all()
         init_db()
-    rec.init()
+        if not os.path.isfile('models/classifier.pkl') or Label.query.filter_by(status='done').count() < 2:
+            print("Chưa có dữ liệu nhận dạng. Hãy thêm dữ liệu nhận dạng.")
+        else:
+            rec.init()
+    
     socketio.run(app, debug=True)

@@ -3,7 +3,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from datetime import datetime
 from flask_login import login_required, current_user
 from tool import get_role
-
+import shutil
+import os
+from src.classifier import classifier
+from src.processing import augment_image
+from src.recognition import init
 quanly_bp = Blueprint('quanly', __name__)
 
 @quanly_bp.route('/quanly', methods=[ "POST","GET"])
@@ -14,10 +18,17 @@ def quanly():
         return redirect(url_for("home_home.home"))
 
     
-    db_all_students = db.session.query(Student, Label).outerjoin(Label).add_columns(Student.idStudent, Student.fname, Student.lname, Student.sex, Student.dob, Student.address,  Label.dataName).all()
+    db_all_students = db.session.query(Student, Label).outerjoin(Label).add_columns(Student.idStudent, Student.fname, Student.lname, Student.sex, Student.dob, Student.address,  Label.dataName, Label.status).all()
+    label_count = {
+        'pending': Label.query.filter_by(status='pending').count(),
+        'total': Label.query.count(),
+        'wait': Label.query.filter_by(status='wait').count(),
+        'done': Label.query.filter_by(status='done').count(),
+    }
     db_data_teachers = Teacher.query.all()
     db_all_classes = Class.query.all() #Lấy tất cả lớp để hiển thị
-    return render_template('quanly.html', students=db_all_students, classes=db_all_classes, teachers = db_data_teachers)
+    return render_template('quanly.html', students=db_all_students, classes=db_all_classes, teachers = db_data_teachers, label=Label, label_count=label_count)
+
 @quanly_bp.route("/add_student", methods = ["POST"])
 @login_required
 def add_student():
@@ -35,8 +46,9 @@ def add_student():
         address = request.form["address"]
         
         student = Student(idStudent=student_id, fname=svfname, lname=svlname, sex= sex, dob=birthdate, address=address)
-        student_acc = StudentAccount(id = student_id, password = "1")
-        db.session.add(student,student_acc)
+        student_acc = StudentAccount(id = student_id, password = "1234")
+        db.session.add(student)
+        db.session.add(student_acc)
         db.session.commit()
         flash("Cập nhật thông tin thành công!")
         return redirect(url_for("quanly_quanly.quanly"))
@@ -62,7 +74,8 @@ def add_teacher():
         
         teacher = Teacher(idTeacher=teacher_id, fname=svfname, lname=svlname, sex= sex, dob=birthdate, address=address)
         teacher_acc = TeacherAccount(id = teacher_id, password = '1')
-        db.session.add(teacher,teacher_acc)
+        db.session.add(teacher)
+        db.session.add(teacher_acc)
         db.session.commit()
         flash("Cập nhật thông tin thành công!")
         return redirect(url_for("quanly_quanly.quanly"))
@@ -143,4 +156,88 @@ def delete_class(class_id):
     else:
         flash('Lớp không tồn tại!!', 'error')
     return redirect(url_for('quanly_quanly.quanly'))
+
+@quanly_bp.route('/approve_label/<student_id>', methods=["POST"])
+@login_required
+def approve_label(student_id):
+    if (get_role()!= "admin"):
+        flash("Bạn không có quyền truy cập trang này!")
+        return redirect(url_for("home_home.home"))
     
+    label = Label.query.get(student_id)
+    if label:
+        label.status = "wait"
+        shutil.move(f'dataset/temp/{label.dataName}', f'dataset\processed')
+        db.session.commit()
+        flash('Duyệt label thành công!!', 'success')
+    else:
+        flash('Label không tồn tại!!', 'error')
+    return redirect(url_for('quanly_quanly.quanly'))
+    
+@quanly_bp.route('/reject_label/<student_id>', methods=["POST"])
+@login_required
+def reject_label(student_id):
+    if (get_role()!= "admin"):
+        flash("Bạn không có quyền truy cập trang này!")
+        return redirect(url_for("home_home.home"))
+    
+    label = Label.query.get(student_id)
+    if label:
+        label.status = "reject"
+        shutil.rmtree(f'dataset/temp/{label.dataName}')
+        db.session.commit()
+        flash('Từ chối label thành công!!', 'success')
+    else:
+        flash('Label không tồn tại!!', 'error')
+    return redirect(url_for('quanly_quanly.quanly'))
+
+@quanly_bp.route('/delete_label/<student_id>', methods=["POST"])
+@login_required
+def delete_label(student_id):
+    if (get_role()!= "admin"):
+        flash("Bạn không có quyền truy cập trang này!")
+        return redirect(url_for("home_home.home"))
+    
+    label = Label.query.get(student_id)
+    if label:
+        label.status = "reject"
+        shutil.rmtree(f'dataset/processed/{label.dataName}')
+        db.session.commit()
+        flash('Xóa label thành công!!', 'success')
+    else:
+        flash('Label không tồn tại!!', 'error')
+    return redirect(url_for('quanly_quanly.quanly'))
+
+@quanly_bp.route('/train', methods=["POST"])
+@login_required
+def train():
+    if (get_role()!= "admin"):
+        flash("Bạn không có quyền truy cập trang này!")
+        return redirect(url_for("home_home.home"))
+    # Xóa file classifier
+    label_count = {
+        'pending': Label.query.filter_by(status='pending').count(),
+        'total': Label.query.count(),
+        'wait': Label.query.filter_by(status='wait').count(),
+        'done': Label.query.filter_by(status='done').count(),
+    }
+    if (label_count['wait'] + label_count['done'] <2):
+        flash("Cần ít nhất 2 học sinh đã cập nhật sinh trắc học!",'error')
+        return redirect(url_for('quanly_quanly.quanly'))
+    # Update label status to 'done'
+    labels = Label.query.filter_by(status='wait').all()
+    for label in labels:
+        label.status = 'done'
+    db.session.commit()
+    if os.path.exists("models\classifier.pkl"):
+        os.remove("models\classifier.pkl")
+    try:
+        classifier(mode="TRAIN",data_dir="dataset\processed", classifier_filename="models\classifier.pkl")
+        init()
+        flash("Train thành công!", 'success')
+    except:
+        flash("Train thất bại!", 'error')
+    finally:
+        return redirect(url_for('quanly_quanly.quanly'))
+    
+    # return redirect(url_for('quanly_quanly.quanly'))

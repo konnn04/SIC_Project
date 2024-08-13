@@ -105,8 +105,8 @@
                     {% for student in students_checkin %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{ student.student_id }}</td>
-                        <td>{{ student.svlname}} {{ student.svfname}}</td>
+                        <td>{{ student.idStudent }}</td>
+                        <td>{{ student.lname}} {{ student.fname}}</td>
                         <!-- <td>{{ student.class_id }}</td> -->
                         <td>{{ student.date}} {{ student.time}}</td>
                     </tr>

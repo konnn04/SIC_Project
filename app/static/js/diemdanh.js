@@ -83,7 +83,7 @@ socket.on('update_checkin_students', (data) => {
 })
 
 socket.on('update_results2', (data) => {
-    // console.log(data)
+    console.log(data)
     if (data.update) 
         playPing()
     ctx.clearRect(0, 0, canvas.width, canvas.height);

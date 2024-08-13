@@ -57,10 +57,12 @@
         <option value="class">Lớp học</option>
         <option value="student">Sinh viên</option>
         <option value="teacher">Giáo viên</option>
+        <option value="label">Phân lớp nhãn</option>
     </select>
 </div>
 
-<div class="student-container">    
+<div class="student-container"> 
+     
     <div class="container">
         <div class="left">
             <div class="table">
@@ -72,7 +74,7 @@
                             <th>Họ tên</th>
                             <th>Giới tính</th>
                             <th>Ngày sinh</th>
-                            <th>Nhãn</th>
+                            <th>Tình trạng nhãn</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -84,7 +86,7 @@
                             <td>{{ student.lname}} {{student.fname}}</td>
                             <td>{{ student.sex }}</td>
                             <td>{{ student.dob }}</td>
-                            <td>{{ student.dataName}}</td>
+                            <td>{{ student.status}}</td>
                              
                             <td>
                                 <form action="{{ url_for('quanly_quanly.delete_student', student_id=student.idStudent) }}" method="post" style="display:inline;">
@@ -93,6 +95,20 @@
                                 <form action="{{ url_for('chitiet_chitiet.chitiet', student_id=student.idStudent) }}" method="post" style="display:inline;">
                                     <button type="submit">Chi tiết</button>
                                 </form>
+                                {% if student.status == "pending" %}
+                                    <form action="{{ url_for('quanly_quanly.approve_label', student_id=student.idStudent) }}" method="post" style="display:inline;">
+                                        <button type="submit">Duyệt nhãn</button>
+                                    </form>
+                                    <form action="{{ url_for('quanly_quanly.reject_label', student_id=student.idStudent) }}" method="post" style="display:inline;">
+                                        <button type="submit">Từ chối</button>
+                                    </form>
+                                {% endif %}
+                                {% if student.status == "done" %}
+                                    <form action="{{ url_for('quanly_quanly.delete_label', student_id=student.idStudent) }}" method="post" style="display:inline;">
+                                        <button type="submit">Xóa nhãn</button>
+                                    </form>
+                                {% endif %}
+                                
                             </td>
                         </tr>
                         {% endfor %}
@@ -144,6 +160,8 @@
             </form>
         </div>
     </div>
+
+     
     
 </div>
 
@@ -286,48 +304,109 @@
     </div>
     
 </div>
+
+<div class="label-container">
+    <div class="container">
+        <div class="left">
+            <div class="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Số lượng nhãn tổng</th>
+                            <th>Số lượng nhãn chưa duyệt</th>
+                            <th>Số lượng nhãn chưa train</th>
+                            <th>Số lượng nhãn đã train</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ label_count.total }}</td>
+                            <td>{{ label_count.pending }}</td>
+                            <td>{{ label_count.wait }}</td>
+                            <td>{{ label_count.done }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="right">
+            <p>(Thời gian sẽ khá lâu, vui lòng không thoát trang này đến khi train xong)</p>
+            <!-- {% if label_count.wait + label_count.done  > 1 %} -->
+            <form action="{{ url_for('quanly_quanly.train') }}" method="post" style="display:inline;">
+                <button type="submit" id="train">Huấn luyện</button>
+            </form>
+            <!-- {% endif %} -->
+        </div>
+
  
 <script>
     const editorSelect = document.getElementById('editor_select');
     const studentContainer = document.querySelector('.student-container');
     const classContainer = document.querySelector('.class-container');
     const teacherContainer = document.querySelector('.teacher-container');
+    const labelContainer = document.querySelector('.label-container');
+    const trainBtn = document.getElementById('train');
 
-    editorSelect.addEventListener('change', (e) => {
+    
+
+    function selectChange(){
         if (editorSelect.value === 'student') {
             studentContainer.style.display = 'block';
             teacherContainer.style.display = 'none';
             classContainer.style.display = 'none';
+            labelContainer.style.display = 'none';
         }
         if (editorSelect.value === 'class') {
             studentContainer.style.display = 'none';
             teacherContainer.style.display = 'none';
             classContainer.style.display = 'block';
+            labelContainer.style.display = 'none';
         }
         if (editorSelect.value === 'teacher') {
             studentContainer.style.display = 'none';
             teacherContainer.style.display = 'block';
             classContainer.style.display = 'none';
+            labelContainer.style.display = 'none';
         }
+        if (editorSelect.value === 'label') {
+            studentContainer.style.display = 'none';
+            teacherContainer.style.display = 'none';
+            classContainer.style.display = 'none';
+            labelContainer.style.display = 'block';
+        }
+    }
+
+    editorSelect.addEventListener('change', (e) => {
+        selectChange()
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (editorSelect.value === 'student') {
-            studentContainer.style.display = 'block';
-            teacherContainer.style.display = 'none';
-            classContainer.style.display = 'none';
-        }
-        if (editorSelect.value === 'class') {
-            studentContainer.style.display = 'none';
-            teacherContainer.style.display = 'none';
-            classContainer.style.display = 'block';
-        }
-        if (editorSelect.value === 'teacher') {
-            studentContainer.style.display = 'none';
-            teacherContainer.style.display = 'block';
-            classContainer.style.display = 'none';
-        }
-    });
+        selectChange()
+    });     
+
+    trainBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        trainBtn.disabled = true;
+        trainBtn.innerText = 'Đang huấn luyện...';
+        fetch('/train', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            trainBtn.disabled = false;
+            trainBtn.innerText = 'Huấn luyện';
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            trainBtn.disabled = false;
+            trainBtn.innerText = 'Huấn luyện';
+        });
+    })
 
 </script>
 

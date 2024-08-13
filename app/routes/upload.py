@@ -17,14 +17,19 @@ def upload():
 
     if (request.method == "GET"):
         label = Label.query.filter_by(idStudent=current_user.id).first()
-    if (label is None):
-        flash("Bạn chưa cập nhật sinh trắc học, vui lòng thực hiện!")
-        return render_template('upload.html', status = 'none')
-    if (label.status == 'pending'):
-        flash("Sinh trắc học của bạn đang được xử lý, vui lòng chờ!")
-        return render_template('upload.html', status = 'pending')
-    if (label.status == 'done'):
-        flash("Sinh trắc học của bạn đã được cập nhật!")
-        return render_template('upload.html', status = 'done')
+        if (label is None):
+            flash("Bạn chưa cập nhật sinh trắc học, vui lòng thực hiện!")
+            return render_template('upload.html', status = 'none')
+        if (label.status == 'pending'):
+            flash("Sinh trắc học của bạn đang được xử lý, vui lòng chờ!")
+            return render_template('upload.html', status = 'pending')
+        if (label.status == 'done' or label.status == 'wait'):
+            flash("Sinh trắc học của bạn đã được cập nhật!")
+            return render_template('upload.html', status = 'done')
+        if (label.status == 'reject'):
+            flash("Sinh trắc học của bạn đã bị từ chối bởi quản trị viên, vui lòng cập nhật lại!!!")
+            return render_template('upload.html', status = 'reject')
+    return render_template('upload.html', status = 'none')
+    
 
    
